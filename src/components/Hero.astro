@@ -1,0 +1,31 @@
+---
+import profileImage from '../assets/profile.webp';
+---
+
+<section class="max-w-4xl mx-auto px-4 py-12 md:py-20">
+  <div class="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+    <div class="hidden md:block flex-shrink-0 animate-photo">
+      <img src={profileImage.src} alt="Giuliano Espejo Mezzabotta" class="w-48 h-48 rounded-full object-cover border-4 border-[var(--color-accent)]" />
+    </div>
+    <div class="text-center md:text-left flex-1">
+      <h1 class="text-4xl md:text-5xl font-bold text-[var(--color-text-primary)] mb-3">
+        Giuliano Espejo Mezzabotta
+      </h1>
+      <p class="text-xl text-[var(--color-accent)] font-semibold mb-4">
+        Java Backend Developer
+      </p>
+      <p class="text-[var(--color-text-secondary)] max-w-lg mx-auto md:mx-0 mb-6">
+        Técnico Universitario en Programación. Especializado en Spring Boot, APIs REST y PostgreSQL.
+        Actualmente Profesor de Programación en UTN.
+      </p>
+      <div class="flex gap-4 justify-center md:justify-start">
+        <a href="#proyectos" class="px-6 py-2.5 bg-[var(--color-accent)] text-white rounded-lg hover:bg-[var(--color-accent-hover)] transition-colors font-medium">
+          Ver proyectos
+        </a>
+        <a href="#contacto" class="px-6 py-2.5 border border-[var(--color-border)] text-[var(--color-text-primary)] rounded-lg hover:bg-[var(--color-bg-secondary)] transition-colors font-medium">
+          Contacto
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

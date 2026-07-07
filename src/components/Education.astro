@@ -1,0 +1,27 @@
+---
+const certifications = [
+  'Introducción al Desarrollo Web II (40h)',
+  'HTML Course',
+  'React y Spring Boot: Crea tu primera App Full Stack',
+  'React.js Aprende desde Cero Absoluto hasta Trainee',
+  'Visual Studio 2022 C# — Nivel Básico',
+];
+---
+
+<section id="educacion" class="max-w-4xl mx-auto px-4 py-10 animate-section">
+  <h2 class="text-2xl font-bold text-[var(--color-text-primary)] mb-8">Educación</h2>
+  <div class="card p-6 mb-6">
+    <h3 class="text-lg font-semibold text-[var(--color-text-primary)]">Tecnicatura Universitaria en Programación</h3>
+    <p class="text-[var(--color-accent)]">Universidad Tecnológica Nacional</p>
+    <p class="text-sm text-[var(--color-text-secondary)]">Ago 2022 — Jul 2024</p>
+  </div>
+  
+  <h3 class="text-lg font-semibold text-[var(--color-text-primary)] mb-4">Certificaciones</h3>
+  <div class="space-y-2">
+    {certifications.map(cert => (
+      <div class="card !rounded-lg px-4 py-3">
+        <p class="text-[var(--color-text-secondary)] text-sm">{cert}</p>
+      </div>
+    ))}
+  </div>
+</section>

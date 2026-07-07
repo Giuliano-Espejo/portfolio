@@ -1,0 +1,18 @@
+<button id="theme-toggle" class="p-2 rounded-lg hover:bg-[var(--color-border)] transition-colors cursor-pointer" aria-label="Cambiar tema">
+  <!-- Sun icon (visible in dark mode) -->
+  <svg id="sun-icon" class="hidden dark:block w-5 h-5 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m8.66-13.66l-.71.71M4.05 18.95l-.71.71M21 12h-1M4 12H3m16.66 7.34l-.71-.71M4.05 5.05l-.71-.71M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+  </svg>
+  <!-- Moon icon (visible in light mode) -->
+  <svg id="moon-icon" class="block dark:hidden w-5 h-5 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+  </svg>
+</button>
+
+<script>
+  const toggle = document.getElementById('theme-toggle');
+  toggle.addEventListener('click', () => {
+    const isDark = document.documentElement.classList.toggle('dark');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  });
+</script>

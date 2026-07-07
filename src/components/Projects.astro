@@ -1,0 +1,32 @@
+---
+import ProjectCard from './ProjectCard.astro';
+
+const projects = [
+  {
+    title: 'Don Inodoros POS',
+    description: 'Sistema de gestión comercial completo para distribuidora de artículos de limpieza. Incluye control de stock por lote, módulo de usuarios con roles, formas de pago, alertas en tiempo real vía WebSocket y suite de tests de integración.',
+    tags: ['Spring Boot 4', 'Java 21', 'Spring Security 7', 'JPA/Hibernate', 'PostgreSQL', 'WebSocket', 'Gradle'],
+  },
+  {
+    title: 'BurGame — Reservas Gaming',
+    description: 'Sistema de reservas online para centro de videojuegos. API REST con JWT, integración con Mercado Pago para cobro de señas, validación de disponibilidad en tiempo real y panel administrativo.',
+    tags: ['Spring Boot', 'JWT', 'Mercado Pago', 'REST API', 'PostgreSQL'],
+    link: 'https://www.burgame.com',
+    linkLabel: 'Ver sitio',
+  },
+  {
+    title: 'Plataforma Gastronómica',
+    description: 'Plataforma web de venta y gestión de productos gastronómicos. Panel de administración con estadísticas por sucursal, gestión de pedidos con opciones de retiro y delivery, pagos con Mercado Pago.',
+    tags: ['Spring Boot', 'Mercado Pago', 'JPA/Hibernate', 'React', 'TypeScript', 'Tailwind'],
+  },
+];
+---
+
+<section id="proyectos" class="max-w-4xl mx-auto px-4 py-10 animate-section">
+  <h2 class="text-2xl font-bold text-[var(--color-text-primary)] mb-8">Proyectos</h2>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {projects.map(project => (
+      <div class="animate-card"><ProjectCard {...project} /></div>
+    ))}
+  </div>
+</section>

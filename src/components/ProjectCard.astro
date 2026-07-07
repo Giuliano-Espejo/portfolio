@@ -1,0 +1,26 @@
+---
+export interface Props {
+  title: string;
+  description: string;
+  tags: string[];
+  link?: string;
+  linkLabel?: string;
+}
+
+const { title, description, tags, link, linkLabel } = Astro.props;
+---
+
+<div class="card p-6 hover:border-[var(--color-accent)] transition-colors flex flex-col h-full">
+  <h3 class="text-lg font-semibold text-[var(--color-text-primary)] mb-2">{title}</h3>
+  <p class="text-[var(--color-text-secondary)] text-sm leading-relaxed mb-4 flex-1">{description}</p>
+  <div class="flex flex-wrap gap-1.5 mb-4">
+    {tags.map(tag => (
+      <span class="px-2 py-0.5 bg-[var(--color-bg-primary)] font-mono text-xs text-[var(--color-accent)] border border-[var(--color-border)] rounded">{tag}</span>
+    ))}
+  </div>
+  {link && (
+    <a href={link} target="_blank" rel="noopener noreferrer" class="text-sm text-[var(--color-accent)] hover:underline font-medium">
+      {linkLabel || 'Ver proyecto'} →
+    </a>
+  )}
+</div>

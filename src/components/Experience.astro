@@ -1,0 +1,96 @@
+---
+const experiences = [
+  {
+    role: 'Profesor de Programación',
+    company: 'Universidad Tecnológica Nacional',
+    period: 'Ago 2025 — <span class="text-[var(--color-accent)] font-semibold underline decoration-[var(--color-accent)] decoration-2 underline-offset-2">Presente</span>',
+    achievements: [
+      'Profesor de Programación 3 y Programación 4',
+      'Tutor de Programación 2 y Programación 3',
+      'Tutor del pre-universitario (2024)',
+    ],
+    tags: ['Java', 'Python', 'FastAPI', 'Docencia'],
+  },
+  {
+    role: 'Desarrollador Backend Freelance',
+    company: 'Self-Employed',
+    period: 'Jun 2026 — <span class="text-[var(--color-accent)] font-semibold underline decoration-[var(--color-accent)] decoration-2 underline-offset-2">Presente</span>',
+    achievements: [
+      'Sistema POS para distribuidora — Don Inodoros',
+      'Stock por lote con validación transaccional',
+      'Módulo de usuarios con roles y sucursales',
+      'WebSocket con SockJS para alertas en tiempo real',
+      'Suite de tests de integración con MockMvc',
+    ],
+    tags: ['Spring Boot 4', 'Java 21', 'Spring Security 7', 'PostgreSQL', 'WebSocket'],
+  },
+  {
+    role: 'Desarrollador Backend Freelance',
+    company: 'Self-Employed — BurGame',
+    period: 'Feb 2026 — Abr 2026',
+    achievements: [
+      'Sistema de reservas online para centro de gaming',
+      'API REST documentada con JWT authentication',
+      'Integración con Mercado Pago para señas',
+      'Validación de disponibilidad en tiempo real',
+      'Panel administrativo con control de reservas',
+    ],
+    tags: ['Spring Boot', 'JWT', 'Mercado Pago', 'REST API', 'PostgreSQL'],
+    link: 'https://www.burgame.com',
+  },
+  {
+    role: 'Desarrollador Backend Freelance',
+    company: 'Self-Employed',
+    period: 'Mar 2025 — Ago 2025',
+    achievements: [
+      'Plataforma web para venta gastronómica',
+      'Panel admin con gestión de productos, categorías y pedidos',
+      'Pagos con Mercado Pago y efectivo',
+      'Dashboard con estadísticas por sucursal',
+    ],
+    tags: ['Spring Boot', 'Mercado Pago', 'JPA/Hibernate', 'React', 'Tailwind'],
+  },
+  {
+    role: 'Desarrollador Backend',
+    company: 'Semillero Latam',
+    period: 'Jul 2023 — Feb 2024',
+    achievements: [
+      'APIs para bolsa de trabajo',
+      'APIs para E-Commerce',
+      'Autenticación JWT y Google OAuth2',
+      'Algoritmos de estadísticas y reporting',
+    ],
+    tags: ['Java', 'Spring Boot', 'JWT', 'OAuth2', 'REST APIs'],
+  },
+];
+---
+
+<section id="experiencia" class="max-w-4xl mx-auto px-4 py-10 animate-section">
+  <h2 class="text-2xl font-bold text-[var(--color-text-primary)] mb-8">Experiencia</h2>
+  <div class="space-y-6">
+    {experiences.map(exp => (
+      <div class="card p-6 hover:border-[var(--color-accent)] transition-colors animate-card">
+        <div class="flex flex-col md:flex-row md:items-start md:justify-between mb-3">
+          <div>
+            <h3 class="text-lg font-semibold text-[var(--color-text-primary)]">{exp.role}</h3>
+            <p class="text-[var(--color-accent)]">{exp.company}</p>
+          </div>
+          <span class="text-sm text-[var(--color-text-secondary)] mt-1 md:mt-0" set:html={exp.period}></span>
+        </div>
+        <ul class="list-disc list-inside text-[var(--color-text-secondary)] space-y-1 mb-3">
+          {exp.achievements.map(a => <li>{a}</li>)}
+        </ul>
+        <div class="flex flex-wrap gap-2">
+          {exp.tags.map(tag => (
+            <span class="px-2.5 py-1 bg-[var(--color-bg-primary)] font-mono text-xs text-[var(--color-accent)] border border-[var(--color-border)] rounded-md">{tag}</span>
+          ))}
+        </div>
+        {exp.link && (
+          <a href={exp.link} target="_blank" rel="noopener noreferrer" class="inline-block mt-3 text-sm text-[var(--color-accent)] hover:underline">
+            Ver sitio →
+          </a>
+        )}
+      </div>
+    ))}
+  </div>
+</section>
