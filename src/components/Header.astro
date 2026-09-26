@@ -2,26 +2,58 @@
 import ThemeToggle from './ThemeToggle.astro';
 
 const navLinks = [
-  { href: '#sobre-mi', label: 'Sobre mí' },
-  { href: '#experiencia', label: 'Experiencia' },
-  { href: '#proyectos', label: 'Proyectos' },
-  { href: '#skills', label: 'Skills' },
-  { href: '#contacto', label: 'Contacto' },
+  { href: '/#sobre-mi', label: 'Sobre mí' },
+  { href: '/#experiencia', label: 'Experiencia' },
+  { href: '/#proyectos', label: 'Proyectos' },
+  { href: '/#skills', label: 'Skills' },
+  { href: '/#contacto', label: 'Contacto' },
 ];
 ---
 
-<header class="sticky top-0 z-50 bg-[var(--color-bg-primary)]/80 backdrop-blur-sm border-b border-[var(--color-border)]">
-  <nav class="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
-    <a href="/" class="font-semibold text-lg text-[var(--color-accent)] hover:text-[var(--color-accent-hover)] transition-colors">
-      GE
+<header class="sticky top-0 z-50 bg-[color-mix(in_srgb,var(--color-bg-primary)_70%,transparent)] backdrop-blur-md border-b border-[var(--color-border)]">
+  <div class="scroll-progress" data-scroll-progress aria-hidden="true"></div>
+  <nav class="relative max-w-4xl mx-auto px-4 h-16 flex items-center justify-between" aria-label="Principal">
+    <a href="/" class="font-mono font-semibold text-lg text-[var(--color-text-primary)] hover:text-[var(--color-accent)] transition-colors">
+      <span class="text-gradient">GE</span><span class="text-[var(--color-text-secondary)]">.</span>
     </a>
     <div class="flex items-center gap-1 md:gap-4">
       {navLinks.map(link => (
-        <a href={link.href} class="hidden md:block text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-colors">
+        <a
+          href={link.href}
+          data-nav-link
+          class="hidden md:block text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] aria-[current=true]:text-[var(--color-accent)] transition-colors"
+        >
           {link.label}
         </a>
       ))}
       <ThemeToggle />
+
+      <!-- Mobile menu: <details> keeps it usable without JS -->
+      <details id="mobile-menu" class="md:hidden group">
+        <summary class="list-none [&::-webkit-details-marker]:hidden p-2 rounded-lg hover:bg-[var(--color-border)] transition-colors cursor-pointer" aria-label="Abrir menú">
+          <svg class="w-5 h-5 group-open:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16" /></svg>
+          <svg class="w-5 h-5 hidden group-open:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" d="M6 6l12 12M18 6L6 18" /></svg>
+        </summary>
+        <div class="absolute left-0 right-0 top-16 border-b border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2 shadow-xl">
+          {navLinks.map(link => (
+            <a
+              href={link.href}
+              data-nav-link
+              class="block py-3 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] aria-[current=true]:text-[var(--color-accent)] border-b border-[var(--color-border)] last:border-0"
+            >
+              {link.label}
+            </a>
+          ))}
+        </div>
+      </details>
     </div>
   </nav>
 </header>
+
+<script>
+  // Close the mobile menu after choosing a section
+  const menu = document.getElementById('mobile-menu') as HTMLDetailsElement | null;
+  menu?.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', () => menu.removeAttribute('open'));
+  });
+</script>

@@ -1,4 +1,6 @@
 ---
+import SectionHeading from './SectionHeading.astro';
+
 const certifications = [
   'Introducción al Desarrollo Web II (40h)',
   'HTML Course',
@@ -8,20 +10,20 @@ const certifications = [
 ];
 ---
 
-<section id="educacion" class="max-w-4xl mx-auto px-4 py-10 animate-section">
-  <h2 class="text-2xl font-bold text-[var(--color-text-primary)] mb-8">Educación</h2>
-  <div class="card p-6 mb-6">
-    <h3 class="text-lg font-semibold text-[var(--color-text-primary)]">Tecnicatura Universitaria en Programación</h3>
-    <p class="text-[var(--color-accent)]">Universidad Tecnológica Nacional</p>
-    <p class="text-sm text-[var(--color-text-secondary)]">Ago 2022 — Jul 2024</p>
+<section id="educacion" class="max-w-4xl mx-auto px-4 py-12 animate-section">
+  <SectionHeading index="05" title="Educación" />
+  <div class="card gradient-border p-6 mb-8">
+    <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1">
+      <h3 class="text-lg font-semibold text-[var(--color-text-primary)]">Tecnicatura Universitaria en Programación</h3>
+      <p class="font-mono text-xs text-[var(--color-text-secondary)]">Ago 2022 — Jul 2024</p>
+    </div>
+    <p class="font-medium text-[var(--color-accent)]">Universidad Tecnológica Nacional</p>
   </div>
-  
-  <h3 class="text-lg font-semibold text-[var(--color-text-primary)] mb-4">Certificaciones</h3>
-  <div class="space-y-2">
+
+  <h3 class="font-mono text-xs uppercase tracking-wider text-[var(--color-text-secondary)] mb-3">Certificaciones</h3>
+  <ul class="divide-y divide-[var(--color-border)] border-y border-[var(--color-border)]">
     {certifications.map(cert => (
-      <div class="card !rounded-lg px-4 py-3">
-        <p class="text-[var(--color-text-secondary)] text-sm">{cert}</p>
-      </div>
+      <li class="py-3 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:pl-2 transition-all">{cert}</li>
     ))}
-  </div>
+  </ul>
 </section>

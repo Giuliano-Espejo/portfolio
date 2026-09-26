@@ -1,30 +1,43 @@
 ---
+import SectionHeading from './SectionHeading.astro';
+import Tag from './Tag.astro';
+
+// Keep in sync with Experience and src/case-studies/*.md — only list what a project or job backs up
 const skillCategories = [
   {
     title: 'Backend',
-    skills: ['Java', 'Spring Boot', 'Spring Security', 'JPA/Hibernate', 'REST APIs', 'JWT', 'OAuth2', 'WebSocket'],
+    skills: ['Java 21', 'Spring Boot', 'Spring Security', 'Spring Data JPA / Hibernate', 'Bean Validation', 'MapStruct', 'REST APIs', 'JWT', 'OAuth2', 'WebSocket (STOMP / SockJS)', 'Python', 'FastAPI'],
   },
   {
     title: 'Bases de Datos',
-    skills: ['PostgreSQL', 'MySQL', 'JPA/Hibernate'],
+    skills: ['PostgreSQL', 'MySQL', 'H2', 'Flyway', 'Alembic', 'Hibernate Envers'],
   },
   {
-    title: 'Herramientas',
-    skills: ['Gradle', 'Git', 'Docker', 'MockMvc', 'SockJS'],
+    title: 'Testing y calidad',
+    skills: ['JUnit 5', 'MockMvc', 'Spring Security Test', 'TDD', 'Swagger / OpenAPI'],
+  },
+  {
+    title: 'Infra y herramientas',
+    skills: ['Docker', 'Docker Compose', 'Caddy', 'GitHub Actions', 'Git', 'Gradle', 'json-server'],
+  },
+  {
+    title: 'Integraciones',
+    skills: ['Mercado Pago', 'Webhooks', 'Cloudinary', 'OpenRouteService', 'SMTP'],
   },
 ];
 ---
 
-<section id="skills" class="max-w-4xl mx-auto px-4 py-10 animate-section">
-  <h2 class="text-2xl font-bold text-[var(--color-text-primary)] mb-8">Skills</h2>
+<section id="skills" class="max-w-4xl mx-auto px-4 py-12">
+  <SectionHeading index="04" title="Skills" />
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    {skillCategories.map(cat => (
-      <div class="card p-6 animate-card">
-        <h3 class="font-semibold text-[var(--color-accent)] mb-4">{cat.title}</h3>
-        <div class="flex flex-wrap gap-2">
-          {cat.skills.map(skill => (
-            <span class="px-3 py-1.5 bg-[var(--color-bg-primary)] font-mono text-sm text-[var(--color-text-primary)] border border-[var(--color-border)] rounded-lg">{skill}</span>
-          ))}
+    {skillCategories.map((cat, i) => (
+      <div class="card gradient-border p-6 animate-card first:md:col-span-2">
+        <h3 class="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-[var(--color-text-secondary)] mb-4">
+          <span class="h-2 w-2 rounded-full" style={`background: var(--g${(i % 3) + 1}); box-shadow: 0 0 10px var(--g${(i % 3) + 1})`} aria-hidden="true"></span>
+          {cat.title}
+        </h3>
+        <div class="flex flex-wrap gap-2" data-stagger>
+          {cat.skills.map((skill, j) => <Tag size="md" index={j}>{skill}</Tag>)}
         </div>
       </div>
     ))}

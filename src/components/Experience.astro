@@ -1,59 +1,84 @@
 ---
+import SectionHeading from './SectionHeading.astro';
+import Tag from './Tag.astro';
+
 const experiences = [
   {
     role: 'Profesor de Programación',
-    company: 'Universidad Tecnológica Nacional',
-    period: 'Ago 2025 — <span class="text-[var(--color-accent)] font-semibold underline decoration-[var(--color-accent)] decoration-2 underline-offset-2">Presente</span>',
+    company: 'Universidad Tecnológica Nacional — Facultad Regional Mendoza',
+    start: 'Ago 2025',
+    current: true,
     achievements: [
       'Profesor de Programación 3 y Programación 4',
-      'Tutor de Programación 2 y Programación 3',
+      'Dictado de desarrollo backend con Spring Boot y FastAPI',
+      'Fundamentos de HTTP y APIs REST',
       'Tutor del pre-universitario (2024)',
     ],
-    tags: ['Java', 'Python', 'FastAPI', 'Docencia'],
+    tags: ['Java', 'Spring Boot', 'Python', 'FastAPI', 'HTTP', 'Docencia'],
+  },
+  {
+    role: 'Tutor de Programación',
+    company: 'Universidad Tecnológica Nacional — Facultad Regional San Nicolás',
+    start: 'Ago 2025',
+    current: true,
+    achievements: [
+      'Tutor de Programación 2 y Programación 3',
+      'Acompañamiento en desarrollo backend con Spring Boot y FastAPI',
+      'Fundamentos de HTTP y APIs REST',
+    ],
+    tags: ['Java', 'Spring Boot', 'Python', 'FastAPI', 'HTTP', 'Docencia'],
   },
   {
     role: 'Desarrollador Backend Freelance',
-    company: 'Self-Employed',
-    period: 'Jun 2026 — <span class="text-[var(--color-accent)] font-semibold underline decoration-[var(--color-accent)] decoration-2 underline-offset-2">Presente</span>',
+    company: 'Independiente',
+    start: 'Jun 2026',
+    end: 'Jul 2026',
     achievements: [
       'Sistema POS para distribuidora — Don Inodoros',
-      'Stock por lote con validación transaccional',
+      'Stock por sucursal con validación transaccional',
       'Módulo de usuarios con roles y sucursales',
       'WebSocket con SockJS para alertas en tiempo real',
       'Suite de tests de integración con MockMvc',
     ],
-    tags: ['Spring Boot 4', 'Java 21', 'Spring Security 7', 'PostgreSQL', 'WebSocket'],
+    tags: ['Java 21', 'Spring Boot 4', 'Spring Security', 'PostgreSQL', 'Flyway', 'WebSocket', 'Docker'],
+    caseStudy: '/proyectos/don-inodoros',
   },
   {
     role: 'Desarrollador Backend Freelance',
-    company: 'Self-Employed — BurGame',
-    period: 'Feb 2026 — Abr 2026',
+    company: 'Independiente — BurGame',
+    start: 'Feb 2026',
+    end: 'Abr 2026',
     achievements: [
       'Sistema de reservas online para centro de gaming',
-      'API REST documentada con JWT authentication',
+      'API REST documentada con OpenAPI y autenticación JWT',
       'Integración con Mercado Pago para señas',
       'Validación de disponibilidad en tiempo real',
       'Panel administrativo con control de reservas',
     ],
-    tags: ['Spring Boot', 'JWT', 'Mercado Pago', 'REST API', 'PostgreSQL'],
+    tags: ['Java 21', 'Spring Boot', 'JWT', 'Mercado Pago', 'PostgreSQL', 'Docker'],
     link: 'https://www.burgame.com',
+    caseStudy: '/proyectos/burgame',
   },
   {
     role: 'Desarrollador Backend Freelance',
-    company: 'Self-Employed',
-    period: 'Mar 2025 — Ago 2025',
+    company: 'Independiente',
+    start: 'Mar 2025',
+    end: 'Ago 2025',
     achievements: [
-      'Plataforma web para venta gastronómica',
-      'Panel admin con gestión de productos, categorías y pedidos',
-      'Pagos con Mercado Pago y efectivo',
-      'Dashboard con estadísticas por sucursal',
+      'Backend de plataforma de pedidos online — Pasta Fiorella',
+      'API REST por capas para tienda y panel multi-sucursal',
+      'Pagos con Mercado Pago confirmados por webhook',
+      'Costo de envío calculado por distancia',
+      'API mock con json-server para la demo pública',
     ],
-    tags: ['Spring Boot', 'Mercado Pago', 'JPA/Hibernate', 'React', 'Tailwind'],
+    tags: ['Java 17', 'Spring Boot 3', 'JPA/Hibernate', 'PostgreSQL', 'Mercado Pago', 'Docker'],
+    caseStudy: '/proyectos/pasta-fiorella',
   },
   {
     role: 'Desarrollador Backend',
     company: 'Semillero Latam',
-    period: 'Jul 2023 — Feb 2024',
+    start: 'Jul 2023',
+    end: 'Feb 2024',
     achievements: [
       'APIs para bolsa de trabajo',
       'APIs para E-Commerce',
@@ -65,32 +90,44 @@ const experiences = [
 ];
 ---
 
-<section id="experiencia" class="max-w-4xl mx-auto px-4 py-10 animate-section">
-  <h2 class="text-2xl font-bold text-[var(--color-text-primary)] mb-8">Experiencia</h2>
-  <div class="space-y-6">
+<section id="experiencia" class="max-w-4xl mx-auto px-4 py-12">
+  <SectionHeading index="02" title="Experiencia" />
+  <ol class="timeline ml-2 space-y-8" data-timeline>
     {experiences.map(exp => (
-      <div class="card p-6 hover:border-[var(--color-accent)] transition-colors animate-card">
-        <div class="flex flex-col md:flex-row md:items-start md:justify-between mb-3">
-          <div>
+      <li class="relative pl-8 md:pl-10">
+        <span class="timeline-dot" aria-hidden="true"></span>
+        <div class="card gradient-border p-6 animate-card">
+          <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1 mb-1">
             <h3 class="text-lg font-semibold text-[var(--color-text-primary)]">{exp.role}</h3>
-            <p class="text-[var(--color-accent)]">{exp.company}</p>
+            <p class="font-mono text-xs text-[var(--color-text-secondary)] whitespace-nowrap">
+              {exp.start} — {exp.current
+                ? <span class="ml-1 px-2 py-0.5 rounded-full font-sans font-medium bg-[var(--color-highlight-soft)] text-[var(--color-highlight)]">Actual</span>
+                : exp.end}
+            </p>
           </div>
-          <span class="text-sm text-[var(--color-text-secondary)] mt-1 md:mt-0" set:html={exp.period}></span>
+          <p class="font-medium text-[var(--color-accent)] mb-3">{exp.company}</p>
+          <ul class="list-disc pl-5 marker:text-[var(--color-accent)] text-[var(--color-text-secondary)] space-y-1 mb-4">
+            {exp.achievements.map(a => <li>{a}</li>)}
+          </ul>
+          <div class="flex flex-wrap gap-2" data-stagger>
+            {exp.tags.map((tag, i) => <Tag index={i}>{tag}</Tag>)}
+          </div>
+          {(exp.caseStudy || exp.link) && (
+            <div class="flex flex-wrap gap-x-4 gap-y-2 mt-4">
+              {exp.caseStudy && (
+                <a href={exp.caseStudy} class="text-sm font-medium text-[var(--color-accent)] hover:underline">
+                  Ver caso completo →
+                </a>
+              )}
+              {exp.link && (
+                <a href={exp.link} target="_blank" rel="noopener noreferrer" class="text-sm font-medium text-[var(--color-accent)] hover:underline">
+                  Ver sitio ↗
+                </a>
+              )}
+            </div>
+          )}
         </div>
-        <ul class="list-disc list-inside text-[var(--color-text-secondary)] space-y-1 mb-3">
-          {exp.achievements.map(a => <li>{a}</li>)}
-        </ul>
-        <div class="flex flex-wrap gap-2">
-          {exp.tags.map(tag => (
-            <span class="px-2.5 py-1 bg-[var(--color-bg-primary)] font-mono text-xs text-[var(--color-accent)] border border-[var(--color-border)] rounded-md">{tag}</span>
-          ))}
-        </div>
-        {exp.link && (
-          <a href={exp.link} target="_blank" rel="noopener noreferrer" class="inline-block mt-3 text-sm text-[var(--color-accent)] hover:underline">
-            Ver sitio →
-          </a>
-        )}
-      </div>
+      </li>
     ))}
-  </div>
+  </ol>
 </section>

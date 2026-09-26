@@ -1,0 +1,20 @@
+---
+export interface Props {
+  size?: 'sm' | 'md';
+  /** Position in its list, used to stagger the pop-in animation */
+  index?: number;
+}
+
+const { size = 'sm', index = 0 } = Astro.props;
+const sizes = {
+  sm: 'px-2 py-0.5 text-xs rounded-md',
+  md: 'px-3 py-1.5 text-sm rounded-lg',
+};
+---
+
+<span
+  class:list={['inline-block font-mono bg-[var(--color-bg-primary)]/60 text-[var(--color-text-secondary)] border border-[var(--color-border)] hover:text-[var(--color-accent)] hover:border-[var(--color-accent)] transition-colors', sizes[size]]}
+  style={`--i: ${index}`}
+>
+  <slot />
+</span>

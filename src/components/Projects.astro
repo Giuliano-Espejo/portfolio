@@ -1,32 +1,54 @@
 ---
 import ProjectCard from './ProjectCard.astro';
+import SectionHeading from './SectionHeading.astro';
 
+import donInodorosImg from '../assets/projects/don-inodoros.png';
+import burgameImg from '../assets/projects/burgame.png';
+import pastaFiorellaImg from '../assets/projects/pasta-fiorella.png';
+import { frontmatter as pastaFiorella } from '../case-studies/pasta-fiorella.md';
+import { frontmatter as burgame } from '../case-studies/burgame.md';
+import { frontmatter as donInodoros } from '../case-studies/don-inodoros.md';
+
+// To add a screenshot: put it in src/assets/projects/, import it and pass `image` (+ `imageAlt`).
+// `repo` adds a "Código ↗" link; `caseStudy` links to an internal write-up page.
 const projects = [
   {
-    title: 'Don Inodoros POS',
-    description: 'Sistema de gestión comercial completo para distribuidora de artículos de limpieza. Incluye control de stock por lote, módulo de usuarios con roles, formas de pago, alertas en tiempo real vía WebSocket y suite de tests de integración.',
-    tags: ['Spring Boot 4', 'Java 21', 'Spring Security 7', 'JPA/Hibernate', 'PostgreSQL', 'WebSocket', 'Gradle'],
+    title: donInodoros.title,
+    description: donInodoros.teaser,
+    tags: ['Java 21', 'Spring Boot 4', 'Spring Security', 'PostgreSQL', 'Flyway', 'WebSocket', 'Docker'],
+    image: donInodorosImg,
+    imageAlt: donInodoros.imageAlt,
+    caseStudy: '/proyectos/don-inodoros',
   },
   {
-    title: 'BurGame — Reservas Gaming',
-    description: 'Sistema de reservas online para centro de videojuegos. API REST con JWT, integración con Mercado Pago para cobro de señas, validación de disponibilidad en tiempo real y panel administrativo.',
-    tags: ['Spring Boot', 'JWT', 'Mercado Pago', 'REST API', 'PostgreSQL'],
-    link: 'https://www.burgame.com',
-    linkLabel: 'Ver sitio',
+    title: `${burgame.title} — Reservas gaming`,
+    description: burgame.teaser,
+    tags: ['Java 21', 'Spring Boot 3.5', 'Spring Security', 'PostgreSQL', 'Mercado Pago', 'Docker'],
+    image: burgameImg,
+    imageAlt: burgame.imageAlt,
+    caseStudy: '/proyectos/burgame',
+    link: burgame.demos[0].href,
+    linkLabel: 'Sitio',
   },
   {
-    title: 'Plataforma Gastronómica',
-    description: 'Plataforma web de venta y gestión de productos gastronómicos. Panel de administración con estadísticas por sucursal, gestión de pedidos con opciones de retiro y delivery, pagos con Mercado Pago.',
-    tags: ['Spring Boot', 'Mercado Pago', 'JPA/Hibernate', 'React', 'TypeScript', 'Tailwind'],
+    title: `${pastaFiorella.title} — Pedidos online`,
+    description: pastaFiorella.teaser,
+    tags: ['Java 17', 'Spring Boot 3', 'PostgreSQL', 'Mercado Pago', 'Docker', 'json-server'],
+    image: pastaFiorellaImg,
+    imageAlt: 'Home de la tienda online de Pasta Fiorella',
+    caseStudy: '/proyectos/pasta-fiorella',
+    link: pastaFiorella.demos[0].href,
+    linkLabel: 'Tienda',
+    links: [{ label: 'Dashboard', href: pastaFiorella.demos[1].href }],
   },
 ];
 ---
 
-<section id="proyectos" class="max-w-4xl mx-auto px-4 py-10 animate-section">
-  <h2 class="text-2xl font-bold text-[var(--color-text-primary)] mb-8">Proyectos</h2>
+<section id="proyectos" class="max-w-4xl mx-auto px-4 py-12">
+  <SectionHeading index="03" title="Proyectos" />
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    {projects.map(project => (
-      <div class="animate-card"><ProjectCard {...project} /></div>
+    {projects.map((project, i) => (
+      <div class="animate-card"><ProjectCard {...project} variant={i} /></div>
     ))}
   </div>
 </section>

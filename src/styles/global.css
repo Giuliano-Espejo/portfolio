@@ -1,34 +1,68 @@
 @import "tailwindcss";
 
+/* Tailwind v4 defaults `dark:` to prefers-color-scheme; follow the .dark class set by ThemeToggle instead */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: 'Inter Variable', sans-serif;
+  --font-display: 'Space Grotesk Variable', 'Inter Variable', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 }
 
+/* ============ Tokens ============ */
+/* Neutral zinc grays + a blue spectrum (indigo → blue → cyan) */
+
 /* Light mode (default) */
 :root {
-  --color-bg-primary: #f1f5f9;
-  --color-bg-secondary: #f8fafc;
-  --color-text-primary: #0f172a;
-  --color-text-secondary: #475569;
+  color-scheme: light;
+  --color-bg-primary: #f4f4f5;
+  --color-bg-secondary: #e4e4e7;
+  --color-text-primary: #18181b;
+  --color-text-secondary: #52525b;
   --color-accent: #2563eb;
   --color-accent-hover: #1d4ed8;
-  --color-border: #cbd5e1;
-  --color-card-bg: #ffffff;
-  --color-card-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --color-on-accent: #ffffff;
+  --color-highlight: #0e7490;
+  --color-highlight-soft: rgba(8, 145, 178, 0.1);
+  --color-success: #15803d;
+  --color-success-soft: rgba(21, 128, 61, 0.1);
+  --color-border: rgba(24, 24, 27, 0.12);
+  --color-card-bg: rgba(255, 255, 255, 0.7);
+  --color-card-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px -12px rgba(37, 99, 235, 0.15);
+  --g1: #4f46e5;
+  --g2: #2563eb;
+  --g3: #0891b2;
+  --blob-opacity: 0.35;
+  --grain-opacity: 0.035;
 }
 
 /* Dark mode */
 html.dark {
-  --color-bg-primary: #0f172a;
-  --color-bg-secondary: #1e293b;
-  --color-text-primary: #f1f5f9;
-  --color-text-secondary: #94a3b8;
-  --color-accent: #38bdf8;
-  --color-accent-hover: #7dd3fc;
-  --color-border: #334155;
-  --color-card-bg: #1e293b;
-  --color-card-shadow: 0 1px 3px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.15);
+  color-scheme: dark;
+  --color-bg-primary: #09090b;
+  --color-bg-secondary: #18181b;
+  --color-text-primary: #fafafa;
+  --color-text-secondary: #a1a1aa;
+  --color-accent: #60a5fa;
+  --color-accent-hover: #93c5fd;
+  --color-on-accent: #ffffff;
+  --color-highlight: #22d3ee;
+  --color-highlight-soft: rgba(34, 211, 238, 0.12);
+  --color-success: #4ade80;
+  --color-success-soft: rgba(74, 222, 128, 0.12);
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-card-bg: rgba(24, 24, 27, 0.55);
+  --color-card-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 32px -16px rgba(59, 130, 246, 0.25);
+  --g1: #6366f1;
+  --g2: #3b82f6;
+  --g3: #22d3ee;
+  --blob-opacity: 0.5;
+  --grain-opacity: 0.05;
+}
+
+html {
+  /* Keeps anchored headings clear of the sticky header (h-16) */
+  scroll-padding-top: 5rem;
 }
 
 body {
@@ -38,52 +72,538 @@ body {
   transition: background-color 0.3s, color 0.3s;
 }
 
-/* Card styling */
+h1, h2, h3 {
+  font-family: var(--font-display);
+}
+
+::selection {
+  background: var(--g2);
+  color: #fff;
+}
+
+/* ============ Surfaces ============ */
+
 .card {
   background-color: var(--color-card-bg);
   border: 1px solid var(--color-border);
-  border-radius: 0.75rem;
+  border-radius: 1rem;
   box-shadow: var(--color-card-shadow, none);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
-/* ============ Scroll Animations ============ */
+/* Gradient border that fades in on hover */
+.gradient-border {
+  position: relative;
+}
 
-.animate-section {
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  padding: 1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, var(--g1), var(--g2), var(--g3));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
   opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
 }
 
-.animate-section.is-visible {
+.gradient-border:hover::before,
+.gradient-border:focus-within::before {
   opacity: 1;
-  transform: translateY(0);
 }
 
-.animate-card {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+.text-gradient {
+  background: linear-gradient(90deg, var(--g1), var(--g2), var(--g3), var(--g2), var(--g1));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
-.animate-card.is-visible {
-  opacity: 1;
-  transform: translateY(0);
+/* Fixed darker stops in both themes: white on #3b82f6 is only 3.7:1 */
+.btn-gradient {
+  background: linear-gradient(135deg, #4f46e5, #2563eb);
+  color: var(--color-on-accent);
+  box-shadow: 0 8px 24px -8px var(--g2);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 
-/* Stagger: each child card delays a bit more */
-.animate-card:nth-child(2) { transition-delay: 0.1s; }
-.animate-card:nth-child(3) { transition-delay: 0.2s; }
-.animate-card:nth-child(4) { transition-delay: 0.3s; }
-.animate-card:nth-child(5) { transition-delay: 0.4s; }
-
-/* Hero photo: zoom-in effect */
-.animate-photo {
-  opacity: 0;
-  transform: scale(0.8);
-  transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+.btn-gradient:hover {
+  box-shadow: 0 12px 32px -8px var(--g2);
+  transform: translateY(-2px);
 }
 
-.animate-photo.is-visible {
-  opacity: 1;
-  transform: scale(1);
+/* Faint grid, fading out from the top */
+.bg-grid {
+  background-image:
+    linear-gradient(var(--color-border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-border) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse at 50% 0%, black 0%, transparent 75%);
+}
+
+/* ============ Aurora background ============ */
+/* Radial gradients instead of filter: blur — much cheaper to paint */
+
+.aurora {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.aurora-layer {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+.aurora-blob {
+  position: absolute;
+  border-radius: 9999px;
+  opacity: var(--blob-opacity);
+}
+
+.aurora-blob--1 {
+  width: 60vmax; height: 60vmax;
+  top: -25vmax; left: -15vmax;
+  background: radial-gradient(circle, var(--g1) 0%, transparent 65%);
+}
+
+.aurora-blob--2 {
+  width: 50vmax; height: 50vmax;
+  top: 10vh; right: -20vmax;
+  background: radial-gradient(circle, var(--g3) 0%, transparent 65%);
+}
+
+.aurora-blob--3 {
+  width: 45vmax; height: 45vmax;
+  bottom: -25vmax; left: 20vw;
+  background: radial-gradient(circle, var(--g2) 0%, transparent 65%);
+}
+
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: -5;
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ============ Scroll progress ============ */
+
+.scroll-progress {
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--g1), var(--g2), var(--g3));
+  transform-origin: left;
+  transform: scaleX(var(--progress, 0));
+}
+
+/* ============ Hero ============ */
+
+.photo-ring {
+  position: relative;
+  border-radius: 9999px;
+  padding: 4px;
+  isolation: isolate;
+}
+
+/* Spinning gradient ring + soft glow behind the photo */
+.photo-ring::before,
+.photo-ring::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: conic-gradient(from 0deg, var(--g1), var(--g2), var(--g3), var(--g1));
+  z-index: -1;
+}
+
+.photo-ring::after {
+  inset: -12px;
+  filter: blur(24px);
+  opacity: 0.55;
+}
+
+/* Typewriter caret */
+.typewriter-caret {
+  display: inline-block;
+  width: 0.55em;
+  height: 1.1em;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  background: linear-gradient(180deg, var(--g2), var(--g3));
+  border-radius: 1px;
+}
+
+/* Word mask reveal: outer span clips, inner span slides up */
+.reveal-word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  padding-bottom: 0.08em;
+}
+
+.reveal-word > span {
+  display: inline-block;
+}
+
+/* ============ Section heading ============ */
+
+.heading-char {
+  display: inline-block;
+}
+
+.heading-line {
+  background: linear-gradient(90deg, var(--g2), transparent);
+  transform-origin: left;
+}
+
+/* ============ Timeline ============ */
+
+.timeline {
+  position: relative;
+}
+
+.timeline::before,
+.timeline::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0; left: 0;
+  width: 2px;
+  border-radius: 2px;
+}
+
+.timeline::before {
+  background: var(--color-border);
+}
+
+/* Filled part of the line, driven by --progress (0–1) from the scroll script */
+.timeline::after {
+  background: linear-gradient(180deg, var(--g1), var(--g2), var(--g3));
+  transform-origin: top;
+  transform: scaleY(var(--progress, 1));
+  box-shadow: 0 0 12px var(--g2);
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -6px;
+  top: 0.45rem;
+  width: 14px; height: 14px;
+  border-radius: 9999px;
+  border: 2px solid var(--color-border);
+  background: var(--color-bg-primary);
+  z-index: 1;
+  transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, transform 0.4s ease;
+}
+
+.timeline-dot.is-active {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--g1), var(--g3));
+  box-shadow: 0 0 0 4px var(--color-highlight-soft), 0 0 16px var(--g2);
+  transform: scale(1.1);
+}
+
+/* ============ Motion ============ */
+/* Content is only hidden when JS runs (html.js) and the user accepts motion */
+
+@keyframes drift-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(8vw, 6vh) scale(1.1); }
+}
+
+@keyframes drift-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-10vw, 8vh) scale(0.9); }
+}
+
+@keyframes drift-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(6vw, -10vh) scale(1.15); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  to { background-position: 200% center; }
+}
+
+@keyframes rise {
+  from { transform: translateY(110%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(16px); filter: blur(6px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+@keyframes scroll-cue {
+  0% { transform: scaleY(0); transform-origin: top; }
+  50% { transform: scaleY(1); transform-origin: top; }
+  51% { transform: scaleY(1); transform-origin: bottom; }
+  100% { transform: scaleY(0); transform-origin: bottom; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  .aurora-blob--1 { animation: drift-1 22s ease-in-out infinite; }
+  .aurora-blob--2 { animation: drift-2 26s ease-in-out infinite; }
+  .aurora-blob--3 { animation: drift-3 30s ease-in-out infinite; }
+
+  .photo-ring::before,
+  .photo-ring::after {
+    animation: spin 8s linear infinite;
+  }
+
+  .text-gradient--animated {
+    animation: shimmer 6s linear infinite;
+  }
+
+  .typewriter-caret {
+    animation: blink 1s steps(1) infinite;
+  }
+
+  .reveal-word > span {
+    animation: rise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    animation-delay: calc(var(--i, 0) * 90ms + 150ms);
+  }
+
+  /* Gradient words need both animations; a single `animation` would drop the shimmer */
+  .reveal-word > .text-gradient--animated {
+    animation:
+      rise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both,
+      shimmer 6s linear infinite;
+    animation-delay: calc(var(--i, 0) * 90ms + 150ms), 0s;
+  }
+
+  .hero-fade {
+    animation: fade-up 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    animation-delay: var(--delay, 0ms);
+  }
+
+  .scroll-cue-line {
+    animation: scroll-cue 2.2s cubic-bezier(0.7, 0, 0.3, 1) infinite;
+  }
+
+  /* Scroll reveals */
+  html.js .animate-section,
+  html.js .animate-card {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.7s ease-out, transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.7s ease-out;
+  }
+
+  /* Blur only small elements: filtering a many-viewport-tall section repaints it all and stutters */
+  html.js .animate-card {
+    filter: blur(4px);
+  }
+
+  html.js .animate-section.is-visible,
+  html.js .animate-card.is-visible {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+
+  /* Stagger: each sibling card delays a bit more */
+  .animate-card:nth-child(2) { transition-delay: 0.1s; }
+  .animate-card:nth-child(3) { transition-delay: 0.2s; }
+  .animate-card:nth-child(4) { transition-delay: 0.3s; }
+  .animate-card:nth-child(5) { transition-delay: 0.4s; }
+
+  /* Heading letters rise one after another when the heading enters */
+  html.js .reveal-heading .heading-char {
+    opacity: 0;
+    transform: translateY(0.5em) rotate(6deg);
+    transition: opacity 0.5s ease-out, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition-delay: calc(var(--i) * 28ms);
+  }
+
+  html.js .reveal-heading .heading-line {
+    transform: scaleX(0);
+    transition: transform 1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s;
+  }
+
+  html.js .reveal-heading.is-visible .heading-char {
+    opacity: 1;
+    transform: none;
+  }
+
+  html.js .reveal-heading.is-visible .heading-line {
+    transform: scaleX(1);
+  }
+
+  /* Tags pop in with a stagger once their card is visible */
+  html.js .animate-card [data-stagger] > * {
+    opacity: 0;
+    transform: scale(0.85);
+    transition: opacity 0.35s ease-out, transform 0.35s cubic-bezier(0.3, 1.4, 0.5, 1);
+    transition-delay: calc(var(--i, 0) * 35ms + 150ms);
+  }
+
+  html.js .animate-card.is-visible [data-stagger] > * {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ============ Case study (rendered markdown) ============ */
+
+.prose-case {
+  color: var(--color-text-secondary);
+  font-size: 1.0625rem;
+  line-height: 1.75;
+}
+
+.prose-case h2 {
+  margin: 3.5rem 0 1.25rem;
+  font-size: 1.875rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+}
+
+.prose-case h2:first-child {
+  margin-top: 0;
+}
+
+.prose-case h3 {
+  margin: 2.25rem 0 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.prose-case p {
+  margin: 1rem 0;
+}
+
+.prose-case strong {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.prose-case ul {
+  margin: 1rem 0;
+  padding-left: 1.25rem;
+  list-style: disc;
+}
+
+.prose-case li {
+  margin: 0.5rem 0;
+  padding-left: 0.25rem;
+}
+
+.prose-case li::marker {
+  color: var(--color-accent);
+}
+
+.prose-case code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  padding: 0.1em 0.4em;
+  border-radius: 0.375rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-card-bg);
+  color: var(--color-accent);
+}
+
+.prose-case pre {
+  margin: 1.5rem 0;
+  padding: 1.25rem 1.5rem;
+  overflow-x: auto;
+  border-radius: 1rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-card-bg) !important;
+  backdrop-filter: blur(10px);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.prose-case pre code {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-text-primary);
+}
+
+/* Wide tables scroll on their own instead of pushing the page sideways */
+.prose-case table {
+  display: block;
+  width: 100%;
+  margin: 1.5rem 0;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.prose-case th,
+.prose-case td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.prose-case th {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+}
+
+.prose-case td:first-child {
+  white-space: nowrap;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* Mermaid diagrams (rendered client-side from ```mermaid blocks) */
+.prose-case h3:first-child {
+  margin-top: 0;
+}
+
+.prose-case .mermaid-diagram {
+  display: flex;
+  justify-content: center;
+  min-height: 12rem;
+  margin: 1.25rem 0 3rem;
+  padding: 1.5rem;
+  overflow-x: auto;
+  border-radius: 1rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-card-bg);
+  backdrop-filter: blur(10px);
+}
+
+.prose-case .mermaid-diagram:last-child {
+  margin-bottom: 0;
+}
+
+/* Keep labels readable on phones: the diagram scrolls sideways inside its box instead of shrinking */
+.prose-case .mermaid-diagram svg {
+  min-width: 520px;
+  height: auto;
 }

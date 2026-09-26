@@ -1,27 +1,46 @@
-<section id="contacto" class="max-w-4xl mx-auto px-4 py-10 animate-section">
-  <h2 class="text-2xl font-bold text-[var(--color-text-primary)] mb-8">Contacto</h2>
-  <div class="card p-6 md:p-8">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div>
-        <h3 class="text-sm font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider mb-3">Email</h3>
-        <a href="mailto:espejogiuliano@gmail.com" class="text-[var(--color-accent)] hover:underline break-all">espejogiuliano@gmail.com</a>
-      </div>
-      <div>
-        <h3 class="text-sm font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider mb-3">Teléfono</h3>
-        <p class="text-[var(--color-text-primary)]">+54 9 261 251 5732</p>
-      </div>
-      <div>
-        <h3 class="text-sm font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider mb-3">GitHub</h3>
-        <a href="https://github.com/Giuliano-Espejo" target="_blank" rel="noopener noreferrer" class="text-[var(--color-accent)] hover:underline break-all">github.com/Giuliano-Espejo</a>
-      </div>
-      <div>
-        <h3 class="text-sm font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider mb-3">LinkedIn</h3>
-        <a href="https://www.linkedin.com/in/giuliano-espejo-mezzabotta" target="_blank" rel="noopener noreferrer" class="text-[var(--color-accent)] hover:underline break-all">linkedin.com/in/giuliano-espejo-mezzabotta</a>
-      </div>
+---
+import SectionHeading from './SectionHeading.astro';
+
+const channels = [
+  { label: 'Email', value: 'espejogiuliano@gmail.com', href: 'mailto:espejogiuliano@gmail.com' },
+  { label: 'Teléfono', value: '+54 9 261 251 5732', href: 'tel:+5492612515732' },
+  { label: 'GitHub', value: 'github.com/Giuliano-Espejo', href: 'https://github.com/Giuliano-Espejo', external: true },
+  { label: 'LinkedIn', value: 'linkedin.com/in/giuliano-espejo-mezzabotta', href: 'https://www.linkedin.com/in/giuliano-espejo-mezzabotta', external: true },
+];
+---
+
+<section id="contacto" class="max-w-4xl mx-auto px-4 py-12 animate-section">
+  <SectionHeading index="06" title="Contacto" />
+  <div class="card gradient-border relative p-6 md:p-10">
+    <div class="absolute inset-0 -z-10 overflow-hidden rounded-[inherit]" aria-hidden="true">
+      <div class="absolute -top-24 -right-24 h-72 w-72 rounded-full opacity-40" style="background: radial-gradient(circle, var(--g3), transparent 70%)"></div>
     </div>
-    <div class="mt-8 pt-6 border-t border-[var(--color-border)]">
-      <a href="/Profile.pdf" download="Giuliano_Espejo_CV.pdf" class="inline-flex items-center gap-2 px-6 py-3 bg-[var(--color-accent)] text-white rounded-lg hover:bg-[var(--color-accent-hover)] transition-colors font-medium">
-        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+    <p class="text-xl md:text-2xl font-display font-medium text-[var(--color-text-primary)] mb-8 max-w-xl">
+      ¿Tenés un proyecto backend o una posición abierta? Escribime y te respondo a la brevedad.
+    </p>
+    <dl class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {channels.map(({ label, value, href, external }) => (
+        <div>
+          <dt class="font-mono text-xs uppercase tracking-wider text-[var(--color-text-secondary)] mb-2">{label}</dt>
+          <dd>
+            <a
+              href={href}
+              class="text-[var(--color-accent)] hover:underline break-all"
+              {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+            >
+              {value}
+            </a>
+          </dd>
+        </div>
+      ))}
+    </dl>
+    <div class="mt-8 pt-6 border-t border-[var(--color-border)] flex flex-wrap gap-3">
+      <a href="mailto:espejogiuliano@gmail.com" class="btn-gradient inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        Escribime
+      </a>
+      <a href="/Profile.pdf" download="Giuliano_Espejo_CV.pdf" class="inline-flex items-center gap-2 px-6 py-3 border border-[var(--color-border)] text-[var(--color-text-primary)] rounded-lg hover:bg-[var(--color-bg-secondary)] transition-colors font-medium">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
         Descargar CV (PDF)
       </a>
     </div>

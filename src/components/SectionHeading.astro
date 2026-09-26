@@ -1,0 +1,29 @@
+---
+export interface Props {
+  index: string;
+  title: string;
+}
+
+const { index, title } = Astro.props;
+
+// Split into words → chars so letters can animate one by one without breaking words across lines
+let charIndex = 0;
+const words = title.split(' ').map(word => [...word].map(char => ({ char, i: charIndex++ })));
+---
+
+<div class="reveal-heading flex items-center gap-4 mb-10">
+  <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-[var(--color-text-primary)]" aria-label={title}>
+    <span class="font-mono text-base md:text-lg font-medium text-gradient mr-3 align-middle" aria-hidden="true">{index}.</span>
+    <span aria-hidden="true">
+      {words.map((chars, w) => (
+        <>
+          <span class="inline-block whitespace-nowrap">
+            {chars.map(({ char, i }) => <span class="heading-char" style={`--i: ${i}`}>{char}</span>)}
+          </span>
+          {w < words.length - 1 && ' '}
+        </>
+      ))}
+    </span>
+  </h2>
+  <span class="heading-line h-px flex-1" aria-hidden="true"></span>
+</div>

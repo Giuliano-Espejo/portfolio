@@ -1,5 +1,6 @@
 ---
 import "@fontsource-variable/inter";
+import "@fontsource-variable/space-grotesk";
 import "@fontsource/jetbrains-mono";
 import "../styles/global.css";
 
@@ -10,7 +11,8 @@ export interface Props {
 
 const { title = 'Giuliano Espejo Mezzabotta — Java Backend Developer | Portfolio', description = 'Portfolio profesional de Giuliano Espejo Mezzabotta, Desarrollador Backend Java especializado en Spring Boot, PostgreSQL y APIs REST. Técnico Universitario en Programación - UTN.' } = Astro.props;
 const ogImage = Astro.site ? new URL('/og-image.png', Astro.site).href : '/og-image.png';
-const canonicalUrl = Astro.site ? Astro.site.href : '/';
+const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : Astro.url.pathname;
+const homeUrl = Astro.site ? Astro.site.href : '/';
 ---
 
 <!doctype html>
@@ -51,7 +53,7 @@ const canonicalUrl = Astro.site ? Astro.site.href : '/';
         "disambiguatingDescription": "Desarrollador Backend Java, Técnico Universitario en Programación por UTN. No está relacionado con la política. No es el diputado nacional.",
         "jobTitle": "Java Backend Developer",
         "description": "Portfolio profesional de Giuliano Espejo Mezzabotta. Desarrollador Backend Java especializado en Spring Boot, PostgreSQL, JPA/Hibernate, APIs REST y WebSockets. Actualmente Profesor de Programación en UTN.",
-        "url": {canonicalUrl ? JSON.stringify(canonicalUrl.replace(/\/$/, '')) : '""'},
+        "url": {JSON.stringify(homeUrl.replace(/\/$/, ''))},
         "sameAs": [
           "https://github.com/Giuliano-Espejo",
           "https://www.linkedin.com/in/giuliano-espejo-mezzabotta"
@@ -62,20 +64,34 @@ const canonicalUrl = Astro.site ? Astro.site.href : '/';
           "@type": "CollegeOrUniversity",
           "name": "Universidad Tecnológica Nacional"
         },
-        "knowsAbout": ["Java", "Spring Boot", "PostgreSQL", "Backend Development", "REST APIs", "JPA/Hibernate", "WebSocket", "JWT"]
+        "knowsAbout": ["Java", "Spring Boot", "Spring Security", "PostgreSQL", "Backend Development", "REST APIs", "JPA/Hibernate", "Flyway", "WebSocket", "JWT", "Docker", "Mercado Pago API", "Python", "FastAPI"]
       }
     </script>
 
-    <!-- Theme flash prevention — runs before first paint -->
+    <meta name="theme-color" content="#f4f4f5" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)" />
+
+    <!-- Theme flash prevention — runs before first paint.
+         The `js` class gates the scroll animations so content stays visible without JS. -->
     <script is:inline>
       (function() {
-        const theme = localStorage.getItem('theme')
-          ?? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-        document.documentElement.classList.toggle('dark', theme === 'dark');
+        const root = document.documentElement;
+        root.classList.add('js');
+        let theme = null;
+        try { theme = localStorage.getItem('theme'); } catch (e) {}
+        theme = theme ?? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        root.classList.toggle('dark', theme === 'dark');
       })();
     </script>
   </head>
   <body class="min-h-screen antialiased">
+    <!-- Decorative background: drifting blue glows + film grain -->
+    <div class="aurora" aria-hidden="true">
+      <div class="aurora-layer" data-parallax="0.15"><div class="aurora-blob aurora-blob--1"></div></div>
+      <div class="aurora-layer" data-parallax="-0.1"><div class="aurora-blob aurora-blob--2"></div></div>
+      <div class="aurora-layer" data-parallax="0.25"><div class="aurora-blob aurora-blob--3"></div></div>
+    </div>
+    <div class="grain" aria-hidden="true"></div>
     <slot />
   </body>
 </html>
@@ -91,10 +107,86 @@ const canonicalUrl = Astro.site ? Astro.site.href : '/';
         }
       });
     },
-    { threshold: 0.1, rootMargin: '0px 0px 80px 0px' }
+    // threshold 0: any overlap counts, so elements taller than 10 viewports still reveal
+    { threshold: 0, rootMargin: '0px 0px -8% 0px' }
   );
 
-  document.querySelectorAll('.animate-section, .animate-card, .animate-photo').forEach((el) => {
+  document.querySelectorAll('.animate-section, .animate-card, .reveal-heading').forEach((el) => {
     observer.observe(el);
   });
+
+  // Highlight the nav link of the section currently in view
+  const navLinks = document.querySelectorAll<HTMLAnchorElement>('[data-nav-link]');
+  const sectionObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        navLinks.forEach((link) => {
+          if (link.hash === `#${entry.target.id}`) {
+            link.setAttribute('aria-current', 'true');
+          } else {
+            link.removeAttribute('aria-current');
+          }
+        });
+      });
+    },
+    { rootMargin: '-40% 0px -55% 0px' }
+  );
+
+  document.querySelectorAll('main section[id]').forEach((section) => {
+    sectionObserver.observe(section);
+  });
+
+  // Scroll-linked effects, batched into one rAF per frame:
+  // header progress bar, background parallax and the experience timeline fill
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const progressBar = document.querySelector<HTMLElement>('[data-scroll-progress]');
+  const parallaxLayers = [...document.querySelectorAll<HTMLElement>('[data-parallax]')];
+  const timelines = [...document.querySelectorAll<HTMLElement>('[data-timeline]')].map((el) => ({
+    el,
+    dots: [...el.querySelectorAll<HTMLElement>('.timeline-dot')],
+  }));
+
+  const clamp = (n: number) => Math.min(Math.max(n, 0), 1);
+
+  function update() {
+    const y = window.scrollY;
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    progressBar?.style.setProperty('--progress', max > 0 ? (y / max).toFixed(4) : '0');
+
+    if (reduceMotion) return;
+
+    parallaxLayers.forEach((layer) => {
+      const speed = Number(layer.dataset.parallax);
+      layer.style.transform = `translate3d(0, ${(y * speed * -1).toFixed(1)}px, 0)`;
+    });
+
+    timelines.forEach(({ el, dots }) => {
+      const rect = el.getBoundingClientRect();
+      // The line fills as the timeline passes the middle of the viewport
+      const progress = clamp((window.innerHeight * 0.55 - rect.top) / rect.height);
+      el.style.setProperty('--progress', progress.toFixed(4));
+      const filled = rect.top + progress * rect.height;
+      dots.forEach((dot) => {
+        dot.classList.toggle('is-active', dot.getBoundingClientRect().top <= filled);
+      });
+    });
+  }
+
+  let ticking = false;
+  const onScroll = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      update();
+      ticking = false;
+    });
+  };
+
+  if (reduceMotion) {
+    timelines.forEach(({ dots }) => dots.forEach((dot) => dot.classList.add('is-active')));
+  }
+  update();
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
 </script>
