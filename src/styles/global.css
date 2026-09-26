@@ -622,3 +622,64 @@ h1, h2, h3 {
 .prose-case .diagram-hint:last-child {
   margin-bottom: 0;
 }
+
+/* ============ Site navigation ============ */
+/* A single <ul popover>: author styles beat the UA's [popover] display:none, so on desktop it is always inline */
+
+.site-nav {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 768px) {
+  .site-nav[popover] {
+    position: static;
+    display: flex;
+    gap: 1rem;
+    inset: auto;
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .site-nav[popover]:popover-open {
+    position: fixed;
+    inset: 4rem 0 auto 0;
+    width: 100%;
+    margin: 0;
+    padding: 0.5rem 1rem;
+    border: 0;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-bg-primary);
+    color: inherit;
+    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.35);
+  }
+
+  .site-nav a {
+    display: block;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .site-nav li:last-child a {
+    border-bottom: 0;
+  }
+}
+
+.site-nav-toggle .icon-close,
+header:has(.site-nav:popover-open) .site-nav-toggle .icon-open {
+  display: none;
+}
+
+header:has(.site-nav:popover-open) .site-nav-toggle .icon-close {
+  display: block;
+}

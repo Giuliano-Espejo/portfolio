@@ -14,7 +14,7 @@ const experiences = [
       'Fundamentos de HTTP y APIs REST',
       'Tutor del pre-universitario (2024)',
     ],
-    tags: ['Java', 'Spring Boot', 'Python', 'FastAPI', 'HTTP', 'Docencia'],
+    tags: ['Java', 'Spring Boot', 'Python', 'FastAPI', 'Alembic', 'HTTP', 'Docencia'],
   },
   {
     role: 'Tutor de Programación',
@@ -29,12 +29,12 @@ const experiences = [
     tags: ['Java', 'Spring Boot', 'Python', 'FastAPI', 'HTTP', 'Docencia'],
   },
   {
-    role: 'Desarrollador Backend Freelance',
-    company: 'Independiente',
+    role: 'Desarrollador Backend — Don Inodoros',
+    company: 'Freelance',
     start: 'Jun 2026',
     end: 'Jul 2026',
     achievements: [
-      'Sistema POS para distribuidora — Don Inodoros',
+      'Sistema POS multi-sucursal para una distribuidora',
       'Stock por sucursal con validación transaccional',
       'Módulo de usuarios con roles y sucursales',
       'WebSocket con SockJS para alertas en tiempo real',
@@ -44,8 +44,8 @@ const experiences = [
     caseStudy: '/proyectos/don-inodoros',
   },
   {
-    role: 'Desarrollador Backend Freelance',
-    company: 'Independiente — BurGame',
+    role: 'Desarrollador Backend — BurGame',
+    company: 'Freelance',
     start: 'Feb 2026',
     end: 'Abr 2026',
     achievements: [
@@ -60,12 +60,12 @@ const experiences = [
     caseStudy: '/proyectos/burgame',
   },
   {
-    role: 'Desarrollador Backend Freelance',
-    company: 'Independiente',
+    role: 'Desarrollador Backend — Pasta Fiorella',
+    company: 'Freelance',
     start: 'Mar 2025',
     end: 'Ago 2025',
     achievements: [
-      'Backend de plataforma de pedidos online — Pasta Fiorella',
+      'Backend de una plataforma de pedidos online',
       'API REST por capas para tienda y panel multi-sucursal',
       'Pagos con Mercado Pago confirmados por webhook',
       'Costo de envío calculado por distancia',
@@ -116,12 +116,12 @@ const experiences = [
             <div class="flex flex-wrap gap-x-4 gap-y-2 mt-4">
               {exp.caseStudy && (
                 <a href={exp.caseStudy} class="text-sm font-medium text-[var(--color-accent)] hover:underline">
-                  Ver caso completo →
+                  Ver caso completo<span class="sr-only"> de {exp.role.split(' — ')[1]}</span> →
                 </a>
               )}
               {exp.link && (
                 <a href={exp.link} target="_blank" rel="noopener noreferrer" class="text-sm font-medium text-[var(--color-accent)] hover:underline">
-                  Ver sitio ↗
+                  Ver sitio<span class="sr-only"> de {exp.role.split(' — ')[1]}</span> ↗
                 </a>
               )}
             </div>

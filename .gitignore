@@ -25,3 +25,6 @@ pnpm-debug.log*
 
 # private working docs for case studies (not published)
 PORTFOLIO_*.md
+
+# local SEO reports
+*.mhtml
