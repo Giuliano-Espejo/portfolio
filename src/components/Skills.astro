@@ -6,11 +6,11 @@ import Tag from './Tag.astro';
 const skillCategories = [
   {
     title: 'Backend',
-    skills: ['Java 21', 'Spring Boot', 'Spring Security', 'Spring Data JPA / Hibernate', 'Bean Validation', 'MapStruct', 'REST APIs', 'JWT', 'OAuth2', 'WebSocket (STOMP / SockJS)', 'Python', 'FastAPI'],
+    skills: ['Java 21', 'Spring Boot', 'Spring Security', 'Spring Data JPA / Hibernate', 'Bean Validation', 'MapStruct', 'REST APIs', 'Microservicios', 'JWT', 'OAuth2', 'WebSocket (STOMP / SockJS)', 'Python', 'FastAPI'],
   },
   {
     title: 'Bases de Datos',
-    skills: ['PostgreSQL', 'MySQL', 'H2', 'Flyway', 'Alembic', 'Hibernate Envers'],
+    skills: ['SQL', 'PostgreSQL', 'MySQL', 'H2', 'Flyway', 'Alembic', 'Hibernate Envers'],
   },
   {
     title: 'Testing y calidad',
@@ -18,11 +18,15 @@ const skillCategories = [
   },
   {
     title: 'Infra y herramientas',
-    skills: ['Docker', 'Docker Compose', 'Caddy', 'GitHub Actions', 'Git', 'Gradle', 'json-server'],
+    skills: ['Docker', 'Docker Compose', 'Linux', 'Caddy', 'CI/CD', 'GitHub Actions', 'Git', 'Gradle', 'json-server'],
   },
   {
     title: 'Integraciones',
     skills: ['Mercado Pago', 'Webhooks', 'Cloudinary', 'OpenRouteService', 'SMTP'],
+  },
+  {
+    title: 'Metodologías',
+    skills: ['Scrum', 'Agile', 'Code review'],
   },
 ];
 ---
@@ -31,7 +35,7 @@ const skillCategories = [
   <SectionHeading index="04" title="Skills" />
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     {skillCategories.map((cat, i) => (
-      <div class="card gradient-border p-6 animate-card first:md:col-span-2">
+      <div class="card gradient-border p-6 animate-card first:md:col-span-2 last:md:col-span-2">
         <h3 class="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-[var(--color-text-secondary)] mb-4">
           <span class="h-2 w-2 rounded-full" style={`background: var(--g${(i % 3) + 1}); box-shadow: 0 0 10px var(--g${(i % 3) + 1})`} aria-hidden="true"></span>
           {cat.title}

@@ -1,0 +1,5 @@
+{
+  "redirects": [
+    { "source": "/Profile.pdf", "destination": "/Giuliano_Espejo_CV.pdf", "permanent": true }
+  ]
+}

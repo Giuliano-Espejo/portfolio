@@ -9,14 +9,14 @@ period: Jun 2026 — Jul 2026
 image: don-inodoros.png
 imageAlt: Pantalla de control de inventario del sistema Don Inodoros, con los datos del cliente desenfocados
 stats:
+  - value: "115+"
+    label: ventas en los primeros 2 meses
+  - value: "660+"
+    label: movimientos de stock registrados
+  - value: "~700"
+    label: productos en catálogo
   - value: "2"
     label: sucursales con caja y stock propios
-  - value: "3"
-    label: tramos de precio por producto
-  - value: "2"
-    label: roles con permisos por sucursal
-  - value: "8"
-    label: migraciones versionadas
 problems:
   - title: Stock a ciegas
     text: Los faltantes se descubrían tarde, y no se sabía qué quedaba en cada sucursal.
