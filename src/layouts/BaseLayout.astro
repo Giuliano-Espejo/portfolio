@@ -11,13 +11,54 @@ export interface Props {
   image?: string;
   imageAlt?: string;
   type?: 'website' | 'article';
+  /** Extra schema.org nodes for this page (e.g. BreadcrumbList); merged into the site-wide @graph */
+  jsonLd?: Record<string, unknown>[];
 }
 
-const { title = 'Giuliano Espejo Mezzabotta — Java Backend Developer | Portfolio', description = 'Portfolio profesional de Giuliano Espejo Mezzabotta, Desarrollador Backend Java especializado en Spring Boot, PostgreSQL y APIs REST. Técnico Universitario en Programación - UTN.' } = Astro.props;
+const { title = 'Giuliano Espejo Mezzabotta — Java Backend Developer | Portfolio', description = 'Giuliano Espejo Mezzabotta, Backend Developer Java. APIs con Spring Boot y PostgreSQL en proyectos reales de pagos, reservas y stock. Profesor en la UTN.' } = Astro.props;
 const { image = '/og/home.jpg', imageAlt = 'Giuliano Espejo Mezzabotta — Backend Developer', type = 'website' } = Astro.props;
 const ogImage = Astro.site ? new URL(image, Astro.site).href : image;
 const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : Astro.url.pathname;
 const homeUrl = Astro.site ? Astro.site.href : '/';
+const { jsonLd = [] } = Astro.props;
+
+// Stable ids so page-level nodes can point at the person/site (e.g. a project's author)
+const personId = `${homeUrl}#person`;
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Person',
+      '@id': personId,
+      name: 'Giuliano Espejo Mezzabotta',
+      givenName: 'Giuliano',
+      familyName: 'Espejo Mezzabotta',
+      additionalName: 'Mezzabotta',
+      disambiguatingDescription: 'Desarrollador Backend Java, Técnico Universitario en Programación por UTN. No está relacionado con la política. No es el diputado nacional.',
+      jobTitle: 'Backend Developer',
+      description: 'Backend Developer Java especializado en Spring Boot, PostgreSQL y APIs REST, con proyectos reales de pagos, reservas y stock. Profesor de Programación en la UTN.',
+      url: homeUrl.replace(/\/$/, ''),
+      image: new URL('/og/home.jpg', homeUrl).href,
+      sameAs: [
+        'https://github.com/Giuliano-Espejo',
+        'https://www.linkedin.com/in/giuliano-espejo-mezzabotta',
+      ],
+      email: 'espejogiuliano@gmail.com',
+      telephone: '+54 9 261 251 5732',
+      alumniOf: { '@type': 'CollegeOrUniversity', name: 'Universidad Tecnológica Nacional' },
+      knowsAbout: ['Java', 'Spring Boot', 'Spring Security', 'PostgreSQL', 'Backend Development', 'REST APIs', 'JPA/Hibernate', 'Flyway', 'WebSocket', 'JWT', 'Docker', 'Mercado Pago API', 'Python', 'FastAPI'],
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${homeUrl}#website`,
+      url: homeUrl,
+      name: 'Giuliano Espejo Mezzabotta — Backend Developer',
+      inLanguage: 'es-AR',
+      publisher: { '@id': personId },
+    },
+    ...jsonLd,
+  ],
+};
 ---
 
 <!doctype html>
@@ -50,32 +91,8 @@ const homeUrl = Astro.site ? Astro.site.href : '/';
     <meta name="twitter:image" content={ogImage} />
     <meta name="twitter:image:alt" content={imageAlt} />
 
-    <!-- JSON-LD Structured Data (Person) -->
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "Person",
-        "name": "Giuliano Espejo Mezzabotta",
-        "givenName": "Giuliano",
-        "familyName": "Espejo Mezzabotta",
-        "additionalName": "Mezzabotta",
-        "disambiguatingDescription": "Desarrollador Backend Java, Técnico Universitario en Programación por UTN. No está relacionado con la política. No es el diputado nacional.",
-        "jobTitle": "Java Backend Developer",
-        "description": "Portfolio profesional de Giuliano Espejo Mezzabotta. Desarrollador Backend Java especializado en Spring Boot, PostgreSQL, JPA/Hibernate, APIs REST y WebSockets. Actualmente Profesor de Programación en UTN.",
-        "url": {JSON.stringify(homeUrl.replace(/\/$/, ''))},
-        "sameAs": [
-          "https://github.com/Giuliano-Espejo",
-          "https://www.linkedin.com/in/giuliano-espejo-mezzabotta"
-        ],
-        "email": "espejogiuliano@gmail.com",
-        "telephone": "+54 9 261 251 5732",
-        "alumniOf": {
-          "@type": "CollegeOrUniversity",
-          "name": "Universidad Tecnológica Nacional"
-        },
-        "knowsAbout": ["Java", "Spring Boot", "Spring Security", "PostgreSQL", "Backend Development", "REST APIs", "JPA/Hibernate", "Flyway", "WebSocket", "JWT", "Docker", "Mercado Pago API", "Python", "FastAPI"]
-      }
-    </script>
+    <!-- JSON-LD structured data: Person + WebSite on every page, plus page-specific nodes -->
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
 
     <meta name="theme-color" content="#f4f4f5" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)" />

@@ -2,6 +2,8 @@
 title: BurGame API
 subtitle: Reservas y cobros online para un local gamer
 teaser: Un local gamer con equipos limitados perdía reservas por superposiciones y señas sin cobrar. Ahora se reserva y se paga online sin choques de horario, y marketing sabe qué anuncios convierten.
+# Meta description for search results (keep it under ~155 characters)
+description: 'Backend de reservas y cobros para un local gamer: turnos sin superposiciones, señas con Mercado Pago y campañas medibles. Java 21 y Spring Boot.'
 summary: Un local de gaming con pocos equipos (simuladores, VR, pantallas) coordinaba las reservas a mano, con turnos que se pisaban y señas que no se cobraban. Construí el backend que permite reservar y pagar la seña online, garantiza que ningún equipo se reserve dos veces y le muestra al negocio qué campañas traen clientes.
 period: Feb 2026 — Abr 2026
 image: burgame.png

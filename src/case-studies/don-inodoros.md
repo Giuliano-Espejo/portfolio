@@ -2,6 +2,8 @@
 title: Don Inodoros POS
 subtitle: Punto de venta y stock para un comercio con dos sucursales
 teaser: Dos sucursales llevaban caja y stock a mano, y los faltantes aparecían tarde. Ahora cada sucursal controla su caja y su stock, los precios por cantidad se aplican solos y llegan avisos de stock bajo.
+# Meta description for search results (keep it under ~155 characters)
+description: 'Backend de un punto de venta con dos sucursales: caja con arqueo, stock por sucursal, precios por volumen y alertas de stock bajo. Java 21 y Spring Boot 4.'
 summary: Un comercio de artículos de limpieza con dos sucursales llevaba ventas, caja y stock a mano. Los faltantes y las diferencias de caja aparecían tarde, y los precios por cantidad se calculaban a ojo. Construí el backend de un punto de venta donde cada sucursal maneja su caja y su stock, los precios por volumen se aplican solos y el dueño ve todo consolidado.
 period: Jun 2026 — Jul 2026
 image: don-inodoros.png

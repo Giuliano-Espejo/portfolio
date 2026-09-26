@@ -15,6 +15,8 @@ interface Item { title: string; text: string }
 interface CaseStudy {
   title: string;
   subtitle: string;
+  /** Short meta description for search results (~155 chars) */
+  description: string;
   summary: string;
   period: string;
   meta: { label: string; value: string }[];
@@ -43,7 +45,7 @@ export async function getStaticPaths() {
 const { study } = Astro.props as { study: MarkdownInstance<CaseStudy> };
 const { Content } = study;
 const {
-  title, subtitle, summary, period, meta, stack, problems, solutions, decisions, learned,
+  title, subtitle, description, summary, period, meta, stack, problems, solutions, decisions, learned,
   roleNote, demos = [], demoNote, image, imageAlt, imageUrl, stats = [],
 } = study.frontmatter;
 
@@ -53,6 +55,32 @@ if (image && !screenshot) {
   throw new Error(`Case study "${title}": image "${image}" not found in src/assets/projects/`);
 }
 
+// Structured data: breadcrumb trail + the project as a CreativeWork authored by the site's Person
+const site = Astro.site ?? new URL(Astro.url.origin);
+const pageUrl = new URL(Astro.url.pathname, site).href;
+const jsonLd = [
+  {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Inicio', item: site.href },
+      { '@type': 'ListItem', position: 2, name: 'Proyectos', item: new URL('/#proyectos', site).href },
+      { '@type': 'ListItem', position: 3, name: title, item: pageUrl },
+    ],
+  },
+  {
+    '@type': 'CreativeWork',
+    '@id': `${pageUrl}#project`,
+    name: title,
+    headline: `${title}: ${subtitle}`,
+    description,
+    url: pageUrl,
+    image: new URL(`/og/${Astro.params.slug}.jpg`, site).href,
+    inLanguage: 'es-AR',
+    author: { '@id': new URL('/#person', site).href },
+    keywords: stack.join(', '),
+  },
+];
+
 // Section numbers follow the order they appear in
 const sections = ['El problema', 'La solución', 'Cómo funciona', 'Decisiones clave', 'Ficha técnica'];
 const num = (name: string) => String(sections.indexOf(name) + 1).padStart(2, '0');
@@ -60,10 +88,11 @@ const num = (name: string) => String(sections.indexOf(name) + 1).padStart(2, '0'
 
 <BaseLayout
   title={`${title} — ${subtitle} | Giuliano Espejo Mezzabotta`}
-  description={summary}
+  description={description}
   image={`/og/${Astro.params.slug}.jpg`}
   imageAlt={`${title}: ${subtitle}`}
   type="article"
+  jsonLd={jsonLd}
 >
   <Header />
   <main class="max-w-4xl mx-auto px-4">

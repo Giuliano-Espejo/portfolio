@@ -2,6 +2,8 @@
 title: Pasta Fiorella
 subtitle: Plataforma de pedidos online con delivery
 teaser: Una fábrica de pastas recibía pedidos por mensajes, sin cobro integrado ni un lugar único para organizarlos. Ahora vende online, con pago y envío automáticos, y gestiona todo desde un panel.
+# Meta description for search results (keep it under ~155 characters)
+description: 'Backend de pedidos online para una fábrica de pastas: pago con Mercado Pago, envío calculado por distancia y panel del negocio. Spring Boot y PostgreSQL.'
 summary: Una fábrica de pastas artesanales recibía pedidos por mensajes y apps de terceros, sin cobro integrado ni un lugar único para ver qué preparar. Construí el backend de una plataforma propia donde el cliente pide y paga online, el envío se calcula solo y el negocio organiza todo desde un panel.
 period: Mar 2025 — Ago 2025
 image: pasta-fiorella.png
