@@ -58,7 +58,13 @@ const sections = ['El problema', 'La solución', 'Cómo funciona', 'Decisiones c
 const num = (name: string) => String(sections.indexOf(name) + 1).padStart(2, '0');
 ---
 
-<BaseLayout title={`${title} — ${subtitle} | Giuliano Espejo Mezzabotta`} description={summary}>
+<BaseLayout
+  title={`${title} — ${subtitle} | Giuliano Espejo Mezzabotta`}
+  description={summary}
+  image={`/og/${Astro.params.slug}.jpg`}
+  imageAlt={`${title}: ${subtitle}`}
+  type="article"
+>
   <Header />
   <main class="max-w-4xl mx-auto px-4">
     <!-- Hero -->
@@ -297,7 +303,26 @@ const num = (name: string) => String(sections.indexOf(name) + 1).padStart(2, '0'
       }
     };
 
+    // On narrow screens diagrams scroll sideways; say so only when one actually overflows
+    const updateHints = () => {
+      diagrams.forEach((figure) => {
+        const scrollable = figure.scrollWidth > figure.clientWidth + 1;
+        const next = figure.nextElementSibling;
+        const hint = next?.classList.contains('diagram-hint') ? next : null;
+        if (scrollable && !hint) {
+          const p = document.createElement('p');
+          p.className = 'diagram-hint';
+          p.textContent = 'Deslizá el diagrama para verlo completo →';
+          figure.after(p);
+        } else if (!scrollable && hint) {
+          hint.remove();
+        }
+      });
+    };
+
     await render();
+    updateHints();
+    window.addEventListener('resize', updateHints, { passive: true });
     // Re-theme when the dark/light toggle flips the class on <html>
     let lastDark = document.documentElement.classList.contains('dark');
     new MutationObserver(() => {

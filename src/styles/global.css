@@ -586,8 +586,7 @@ h1, h2, h3 {
 }
 
 .prose-case .mermaid-diagram {
-  display: flex;
-  justify-content: center;
+  display: block;
   min-height: 12rem;
   margin: 1.25rem 0 3rem;
   padding: 1.5rem;
@@ -602,8 +601,24 @@ h1, h2, h3 {
   margin-bottom: 0;
 }
 
-/* Keep labels readable on phones: the diagram scrolls sideways inside its box instead of shrinking */
+/* Keep labels readable on phones: the diagram scrolls sideways inside its box instead of shrinking.
+   Centered with auto margins, not flex: a flex-centered child wider than its box overflows on both
+   sides and the left part can't be scrolled to. Auto margins collapse to 0 when it doesn't fit. */
 .prose-case .mermaid-diagram svg {
+  display: block;
+  margin: 0 auto;
   min-width: 520px;
   height: auto;
+}
+
+.prose-case .diagram-hint {
+  margin: -2.25rem 0 3rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-align: right;
+  color: var(--color-text-secondary);
+}
+
+.prose-case .diagram-hint:last-child {
+  margin-bottom: 0;
 }

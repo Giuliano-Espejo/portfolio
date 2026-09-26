@@ -7,10 +7,15 @@ import "../styles/global.css";
 export interface Props {
   title?: string;
   description?: string;
+  /** Social preview image (1200x630) under public/, e.g. '/og/burgame.jpg' */
+  image?: string;
+  imageAlt?: string;
+  type?: 'website' | 'article';
 }
 
 const { title = 'Giuliano Espejo Mezzabotta — Java Backend Developer | Portfolio', description = 'Portfolio profesional de Giuliano Espejo Mezzabotta, Desarrollador Backend Java especializado en Spring Boot, PostgreSQL y APIs REST. Técnico Universitario en Programación - UTN.' } = Astro.props;
-const ogImage = Astro.site ? new URL('/og-image.png', Astro.site).href : '/og-image.png';
+const { image = '/og/home.jpg', imageAlt = 'Giuliano Espejo Mezzabotta — Backend Developer', type = 'website' } = Astro.props;
+const ogImage = Astro.site ? new URL(image, Astro.site).href : image;
 const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : Astro.url.pathname;
 const homeUrl = Astro.site ? Astro.site.href : '/';
 ---
@@ -33,13 +38,17 @@ const homeUrl = Astro.site ? Astro.site.href : '/';
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:alt" content={imageAlt} />
     <meta property="og:url" content={canonicalUrl} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content="Giuliano Espejo Mezzabotta" />
     <meta property="og:locale" content="es_AR" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={imageAlt} />
 
     <!-- JSON-LD Structured Data (Person) -->
     <script type="application/ld+json">
