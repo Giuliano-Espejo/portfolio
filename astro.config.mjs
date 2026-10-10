@@ -15,17 +15,27 @@ const lastCommitDate = (paths) => {
 };
 
 const sourcesFor = (url) => {
-  const slug = new URL(url).pathname.match(/^\/proyectos\/([^/]+)\/?$/)?.[1];
+  const path = new URL(url).pathname;
+  const en = path.startsWith('/en/') || path === '/en';
+  const slug = path.match(/^(?:\/en)?\/proyectos\/([^/]+)\/?$/)?.[1];
   return slug
-    ? [`src/case-studies/${slug}.md`, 'src/pages/proyectos/[slug].astro']
-    : ['src/pages/index.astro', 'src/components', 'src/layouts', 'src/styles'];
+    ? [`src/case-studies/${en ? 'en/' : ''}${slug}.md`, 'src/components/CaseStudyPage.astro']
+    : ['src/pages', 'src/components', 'src/layouts', 'src/styles', 'src/i18n.ts'];
 };
 
 // https://astro.build/config
 export default defineConfig({
   site: 'https://giuliano-espejo.vercel.app',
+  // Spanish at the root, English under /en (same pages, translated)
+  i18n: {
+    defaultLocale: 'es',
+    locales: ['es', 'en'],
+    routing: { prefixDefaultLocale: false },
+  },
   integrations: [
     sitemap({
+      // Adds hreflang alternates between each Spanish page and its English twin
+      i18n: { defaultLocale: 'es', locales: { es: 'es-AR', en: 'en-US' } },
       serialize(item) {
         item.lastmod = lastCommitDate(sourcesFor(item.url)).toISOString();
         return item;

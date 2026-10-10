@@ -1,25 +1,42 @@
 ---
 import SectionHeading from './SectionHeading.astro';
+import { langFromLocale } from '../i18n';
 
-const certifications = [
-  'Introducción al Desarrollo Web II (40h)',
-  'React y Spring Boot: Crea tu primera App Full Stack',
-];
+const t = {
+  es: {
+    title: 'Educación',
+    tag: 'Baliza 04 // Formación',
+    degree: 'Tecnicatura Universitaria en Programación',
+    period: 'Ago 2022 — Jul 2024',
+    school: 'Universidad Tecnológica Nacional',
+    certsTitle: 'Certificaciones',
+    certifications: ['Introducción al Desarrollo Web II (40h)', 'React y Spring Boot: Crea tu primera App Full Stack'],
+  },
+  en: {
+    title: 'Education',
+    tag: 'Beacon 04 // Training',
+    degree: 'University Degree in Programming (Technician)',
+    period: 'Aug 2022 — Jul 2024',
+    school: 'Universidad Tecnológica Nacional (UTN), Argentina',
+    certsTitle: 'Certifications',
+    certifications: ['Introduction to Web Development II (40h)', 'React and Spring Boot: Build your first Full Stack App'],
+  },
+}[langFromLocale(Astro.currentLocale)];
 ---
 
 <section id="educacion" data-side="right" class="max-w-4xl mx-auto px-4 py-12 animate-section">
-  <SectionHeading index="05" title="Educación" tag="Baliza 04 // Formación" />
+  <SectionHeading index="05" title={t.title} tag={t.tag} />
   <div class="card gradient-border p-6 mb-8">
     <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1">
-      <h3 class="text-lg font-semibold text-[var(--color-text-primary)]">Tecnicatura Universitaria en Programación</h3>
-      <p class="font-mono text-xs text-[var(--color-text-secondary)]">Ago 2022 — Jul 2024</p>
+      <h3 class="text-lg font-semibold text-[var(--color-text-primary)]">{t.degree}</h3>
+      <p class="font-mono text-xs text-[var(--color-text-secondary)]">{t.period}</p>
     </div>
-    <p class="font-medium text-[var(--color-accent)]">Universidad Tecnológica Nacional</p>
+    <p class="font-medium text-[var(--color-accent)]">{t.school}</p>
   </div>
 
-  <h3 class="font-mono text-xs uppercase tracking-wider text-[var(--color-text-secondary)] mb-3">Certificaciones</h3>
+  <h3 class="font-mono text-xs uppercase tracking-wider text-[var(--color-text-secondary)] mb-3">{t.certsTitle}</h3>
   <ul class="divide-y divide-[var(--color-border)] border-y border-[var(--color-border)]">
-    {certifications.map(cert => (
+    {t.certifications.map(cert => (
       <li class="py-3 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:pl-2 transition-all">{cert}</li>
     ))}
   </ul>

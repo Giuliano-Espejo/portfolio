@@ -1,0 +1,14 @@
+---
+// English case study pages: one per markdown file in src/case-studies/en/ (same slugs as Spanish)
+import type { MarkdownInstance } from 'astro';
+import CaseStudyPage from '../../../components/CaseStudyPage.astro';
+import { casePaths, type CaseStudy, type NextMission } from '../../../case-study';
+
+export async function getStaticPaths() {
+  return casePaths(import.meta.glob<MarkdownInstance<CaseStudy>>('../../../case-studies/en/*.md', { eager: true }));
+}
+
+const { study, next } = Astro.props as { study: MarkdownInstance<CaseStudy>; next?: NextMission };
+---
+
+<CaseStudyPage study={study} next={next} />

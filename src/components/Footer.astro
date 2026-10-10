@@ -4,6 +4,10 @@ export interface Props {
   modelCredit?: boolean;
 }
 const { modelCredit = false } = Astro.props;
+import { langFromLocale } from '../i18n';
+const t = langFromLocale(Astro.currentLocale) === 'en'
+  ? { rights: 'All rights reserved.', plane: '3D plane:', by: 'by Poly by Google,', via: 'via Poly Pizza.' }
+  : { rights: 'Todos los derechos reservados.', plane: 'Avión 3D:', by: 'de Poly by Google,', via: 'vía Poly Pizza.' };
 ---
 
 <footer class="border-t border-[var(--color-border)] py-8 mt-16">
@@ -20,12 +24,12 @@ const { modelCredit = false } = Astro.props;
       </a>
     </div>
     <p class="text-sm text-[var(--color-text-secondary)]">
-      &copy; {new Date().getFullYear()} Giuliano Espejo Mezzabotta. Todos los derechos reservados.
+      &copy; {new Date().getFullYear()} Giuliano Espejo Mezzabotta. {t.rights}
     </p>
     {modelCredit && (
       <p class="text-xs text-[var(--color-text-secondary)] mt-2">
-        Avión 3D: <a href="https://poly.pizza/m/8VysVKMXN2J" target="_blank" rel="noopener noreferrer" class="underline hover:text-[var(--color-accent)]">Airplane</a>
-        de Poly by Google, <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener noreferrer" class="underline hover:text-[var(--color-accent)]">CC-BY 3.0</a>, vía Poly Pizza.
+        {t.plane} <a href="https://poly.pizza/m/8VysVKMXN2J" target="_blank" rel="noopener noreferrer" class="underline hover:text-[var(--color-accent)]">Airplane</a>
+        {t.by} <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener noreferrer" class="underline hover:text-[var(--color-accent)]">CC-BY 3.0</a>, {t.via}
       </p>
     )}
   </div>

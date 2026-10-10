@@ -1,38 +1,42 @@
 ---
 import SectionHeading from './SectionHeading.astro';
 import Tag from './Tag.astro';
+import { langFromLocale } from '../i18n';
+
+const en = langFromLocale(Astro.currentLocale) === 'en';
+const t = en ? { tag: 'Beacon 04 // Stack' } : { tag: 'Baliza 04 // Stack' };
 
 // Keep in sync with Experience and src/case-studies/*.md — only list what a project or job backs up
 const skillCategories = [
   {
     title: 'Backend',
-    skills: ['Java 21', 'Spring Boot', 'Spring Security', 'Spring Data JPA / Hibernate', 'Bean Validation', 'MapStruct', 'REST APIs', 'Microservicios', 'JWT', 'OAuth2', 'WebSocket (STOMP / SockJS)', 'Python', 'FastAPI'],
+    skills: ['Java 21', 'Spring Boot', 'Spring Security', 'Spring Data JPA / Hibernate', 'Bean Validation', 'MapStruct', 'REST APIs', en ? 'Microservices' : 'Microservicios', 'JWT', 'OAuth2', 'WebSocket (STOMP / SockJS)', 'Python', 'FastAPI'],
   },
   {
-    title: 'Bases de Datos',
+    title: en ? 'Databases' : 'Bases de Datos',
     skills: ['SQL', 'PostgreSQL', 'MySQL', 'H2', 'Flyway', 'Alembic', 'Hibernate Envers'],
   },
   {
-    title: 'Testing y calidad',
+    title: en ? 'Testing and quality' : 'Testing y calidad',
     skills: ['JUnit 5', 'MockMvc', 'Spring Security Test', 'TDD', 'Swagger / OpenAPI'],
   },
   {
-    title: 'Infra y herramientas',
+    title: en ? 'Infrastructure and tools' : 'Infra y herramientas',
     skills: ['Docker', 'Docker Compose', 'Linux', 'Caddy', 'CI/CD', 'GitHub Actions', 'Git', 'Gradle', 'json-server'],
   },
   {
-    title: 'Integraciones',
+    title: en ? 'Integrations' : 'Integraciones',
     skills: ['Mercado Pago', 'Webhooks', 'Cloudinary', 'OpenRouteService', 'SMTP'],
   },
   {
-    title: 'Metodologías',
+    title: en ? 'Methodologies' : 'Metodologías',
     skills: ['Scrum', 'Agile', 'Code review'],
   },
 ];
 ---
 
 <section id="skills" data-side="right" class="max-w-4xl mx-auto px-4 py-12">
-  <SectionHeading index="04" title="Skills" tag="Baliza 04 // Stack" />
+  <SectionHeading index="04" title="Skills" tag={t.tag} />
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     {skillCategories.map((cat, i) => (
       <div class="card gradient-border p-6 animate-card first:md:col-span-2 last:md:col-span-2">

@@ -1,15 +1,24 @@
 ---
 import SectionHeading from './SectionHeading.astro';
+import { langFromLocale } from '../i18n';
+
+const t = {
+  es: {
+    title: 'Sobre mí',
+    tag: 'Baliza 01 // Perfil',
+    body: 'Soy Giuliano, Técnico Universitario en Programación y actualmente Profesor de Programación 3 y 4 en UTN. En el backend encontré mi lugar: me encanta diseñar APIs limpias, modelar dominios complejos y asegurarme de que todo funcione bien bajo presión. Trabajo con Java, Spring Boot y PostgreSQL, y me gusta entender el negocio antes de escribir una sola línea de código.',
+  },
+  en: {
+    title: 'About me',
+    tag: 'Beacon 01 // Profile',
+    body: "I'm Giuliano, a university-trained programming technician and currently a Programming 3 and 4 teacher at UTN (Argentina). Backend is where I found my place: I love designing clean APIs, modelling complex domains and making sure everything holds up under pressure. I work with Java, Spring Boot and PostgreSQL, and I like to understand the business before writing a single line of code.",
+  },
+}[langFromLocale(Astro.currentLocale)];
 ---
 
 <section id="sobre-mi" class="max-w-4xl mx-auto px-4 py-12 animate-section">
-  <SectionHeading index="01" title="Sobre mí" tag="Baliza 01 // Perfil" />
+  <SectionHeading index="01" title={t.title} tag={t.tag} />
   <div class="card gradient-border p-6 md:p-8">
-    <p class="text-[var(--color-text-secondary)] leading-relaxed text-lg">
-      Soy Giuliano, Técnico Universitario en Programación y actualmente Profesor de Programación 3 y 4 en UTN.
-      En el backend encontré mi lugar: me encanta diseñar APIs limpias, modelar dominios complejos y asegurarme
-      de que todo funcione bien bajo presión. Trabajo con Java, Spring Boot y PostgreSQL, y me gusta entender
-      el negocio antes de escribir una sola línea de código.
-    </p>
+    <p class="text-[var(--color-text-secondary)] leading-relaxed text-lg">{t.body}</p>
   </div>
 </section>

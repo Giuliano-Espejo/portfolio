@@ -6,29 +6,65 @@
 import { Image } from 'astro:assets';
 import profileImage from '../assets/profile.webp';
 import SkyClouds from './SkyClouds.astro';
+import { cvFile, langFromLocale } from '../i18n';
 
-const stops = [
-  { id: 'sobre-mi', label: 'Sobre mí' },
-  { id: 'experiencia', label: 'Experiencia' },
-  { id: 'proyectos', label: 'Proyectos' },
-  { id: 'skills', label: 'Skills' },
-  { id: 'contacto', label: 'Contacto' },
-];
+const lang = langFromLocale(Astro.currentLocale);
+const en = lang === 'en';
+const ids = ['sobre-mi', 'experiencia', 'proyectos', 'skills', 'contacto'];
+const names = en ? ['About', 'Experience', 'Projects', 'Skills', 'Contact'] : ['Sobre mí', 'Experiencia', 'Proyectos', 'Skills', 'Contacto'];
+const stops = ids.map((id, i) => ({ id, label: names[i] }));
 
 // Radio log: the tower talks to GE-01 as it reaches each island (decorative, the content is in the sections)
-const comms = {
-  launch: 'Torre a GE-01: pista libre. Scrolleá para despegar.',
-  takeoff: 'GE-01 en el aire. Rumbo a baliza 01.',
-  arrive: [
-    'Baliza 01 a la vista: perfil del piloto. Técnico en Programación, profe en la UTN.',
-    'Baliza 02: 6 misiones registradas, 2 en curso.',
-    'Baliza 03: 3 sistemas en producción. Pagos, reservas y stock operativos.',
-    'Baliza 04: escaneando stack… Java, Spring Boot y PostgreSQL confirmados.',
-    'Baliza 05: canal abierto. GE-01 espera tu transmisión.',
-  ],
-  complete: 'Misión cumplida: 5/5 balizas. Gracias por volar con GE-01.',
-  free: 'Control manual confirmado. Buen vuelo, GE-01.',
-};
+const comms = en
+  ? {
+      launch: 'Tower to GE-01: runway clear. Scroll to take off.',
+      takeoff: 'GE-01 airborne. Heading for beacon 01.',
+      arrive: [
+        'Beacon 01 in sight: pilot profile. Programming technician, teacher at UTN.',
+        'Beacon 02: 6 missions logged, 2 in progress.',
+        'Beacon 03: 3 systems in production. Payments, bookings and stock operational.',
+        'Beacon 04: scanning stack… Java, Spring Boot and PostgreSQL confirmed.',
+        'Beacon 05: channel open. GE-01 awaiting your transmission.',
+      ],
+      complete: 'Mission accomplished: 5/5 beacons. Thanks for flying with GE-01.',
+      free: 'Manual control confirmed. Have a good flight, GE-01.',
+    }
+  : {
+      launch: 'Torre a GE-01: pista libre. Scrolleá para despegar.',
+      takeoff: 'GE-01 en el aire. Rumbo a baliza 01.',
+      arrive: [
+        'Baliza 01 a la vista: perfil del piloto. Técnico en Programación, profe en la UTN.',
+        'Baliza 02: 6 misiones registradas, 2 en curso.',
+        'Baliza 03: 3 sistemas en producción. Pagos, reservas y stock operativos.',
+        'Baliza 04: escaneando stack… Java, Spring Boot y PostgreSQL confirmados.',
+        'Baliza 05: canal abierto. GE-01 espera tu transmisión.',
+      ],
+      complete: 'Misión cumplida: 5/5 balizas. Gracias por volar con GE-01.',
+      free: 'Control manual confirmado. Buen vuelo, GE-01.',
+    };
+
+const t = en
+  ? {
+      heroLabel: 'Introduction', available: 'Available for backend projects and positions',
+      role: 'Backend Developer · Java & Spring Boot',
+      pitch: 'I design Spring Boot and PostgreSQL APIs for real businesses: payments, bookings and points of sale. Programming teacher at UTN.',
+      callsign: 'Callsign', beacons: '5 beacons to recover', cv: 'Download CV', cvName: 'Giuliano_Espejo_CV_EN.pdf',
+      projects: 'View projects', free: 'Free flight', cue: 'Scroll to take off', rail: 'Beacons',
+      soundOff: 'Sound: off', soundOn: 'Sound: on', sound: 'Sound',
+      hintStrong: 'Sound is off.', hint: 'Turn it on here to hear the engine and the radio.',
+      freeHelp: 'Fly with WASD or the arrow keys, or press and drag. Get close to an island.', exit: 'Back to the portfolio (Esc)', goTo: 'Go to',
+    }
+  : {
+      heroLabel: 'Presentación', available: 'Disponible para proyectos y posiciones backend',
+      role: 'Backend Developer · Java & Spring Boot',
+      pitch: 'Diseño APIs con Spring Boot y PostgreSQL para negocios reales: pagos, reservas y puntos de venta. Profesor de Programación en la UTN.',
+      callsign: 'Indicativo', beacons: '5 balizas por recuperar', cv: 'Descargar CV', cvName: 'Giuliano_Espejo_CV.pdf',
+      projects: 'Ver proyectos', free: 'Vuelo libre', cue: 'Scrolleá para despegar', rail: 'Balizas',
+      soundOff: 'Sonido: apagado', soundOn: 'Sonido: encendido', sound: 'Sonido',
+      hintStrong: 'El sonido está apagado.', hint: 'Activalo acá para escuchar el motor y la radio.',
+      freeHelp: 'Volá con WASD o las flechas, o mantené apretado y arrastrá. Acercate a una isla.', exit: 'Volver al portfolio (Esc)', goTo: 'Ir a',
+    };
+const ui = { soundOff: t.soundOff, soundOn: t.soundOn, goTo: t.goTo };
 ---
 
 <!-- 2D sky: the phones' background (no WebGL there) and the desktop's first paint until the 3D is up -->
@@ -39,14 +75,14 @@ const comms = {
 <div class="flight-labels" data-flight-labels aria-hidden="true"></div>
 <div class="flight-vignette" aria-hidden="true"></div>
 
-<section id="nave" class="flight-hero" aria-label="Presentación">
+<section id="nave" class="flight-hero" aria-label={t.heroLabel}>
   <div class="hud-panel max-w-2xl p-6 md:p-8">
     <p class="hud-label flex items-center gap-2 mb-4">
       <span class="relative flex h-2 w-2" aria-hidden="true">
         <span class="absolute inline-flex h-full w-full rounded-full bg-[var(--color-accent)] opacity-75 motion-safe:animate-ping"></span>
         <span class="relative inline-flex h-2 w-2 rounded-full bg-[var(--color-accent)]"></span>
       </span>
-      Disponible para proyectos y posiciones backend
+      {t.available}
     </p>
     <div class="flex items-center gap-4 md:gap-6">
       <div class="photo-ring flex-shrink-0">
@@ -62,28 +98,25 @@ const comms = {
       </div>
       <h1 class="font-display text-3xl md:text-5xl font-bold tracking-tight leading-[1.05]">Giuliano Espejo Mezzabotta</h1>
     </div>
-    <p class="font-mono text-base md:text-lg text-[var(--color-accent)] mt-3">Backend Developer · Java &amp; Spring Boot</p>
-    <p class="text-[var(--color-text-secondary)] leading-relaxed mt-4">
-      Diseño APIs con Spring Boot y PostgreSQL para negocios reales: pagos, reservas y puntos de venta.
-      Profesor de Programación en la UTN.
-    </p>
+    <p class="font-mono text-base md:text-lg text-[var(--color-accent)] mt-3">{t.role}</p>
+    <p class="text-[var(--color-text-secondary)] leading-relaxed mt-4">{t.pitch}</p>
     <p class="hud-label mt-4">
-      Indicativo <span class="text-[var(--color-text-primary)]">GE-01</span> · 5 balizas por recuperar
+      {t.callsign} <span class="text-[var(--color-text-primary)]">GE-01</span> · {t.beacons}
     </p>
     <div class="flex flex-wrap gap-2 mt-6">
-      <a href="/Giuliano_Espejo_CV.pdf" download="Giuliano_Espejo_CV.pdf" class="hud-btn hud-btn--primary">Descargar CV</a>
-      <a href="#proyectos" class="hud-btn">Ver proyectos</a>
-      <button type="button" class="hud-btn" data-free-toggle hidden>Vuelo libre</button>
+      <a href={cvFile[lang]} download={t.cvName} class="hud-btn hud-btn--primary">{t.cv}</a>
+      <a href="#proyectos" class="hud-btn">{t.projects}</a>
+      <button type="button" class="hud-btn" data-free-toggle hidden>{t.free}</button>
     </div>
   </div>
   <a href="#sobre-mi" class="flight-cue hud-label">
-    Scrolleá para despegar
+    {t.cue}
     <span class="flight-cue-arrow" aria-hidden="true">↓</span>
   </a>
 </section>
 
 <!-- Fixed HUD: a slim beacon rail on the right edge, shown once the scene is running -->
-<nav class="flight-rail" data-flight-hud hidden aria-label="Balizas">
+<nav class="flight-rail" data-flight-hud hidden aria-label={t.rail}>
   <ol class="flex flex-col gap-1">
     {stops.map((s, i) => (
       <li>
@@ -94,18 +127,18 @@ const comms = {
       </li>
     ))}
   </ol>
-  <button type="button" class="rail-item" data-free-toggle aria-label="Vuelo libre">
-    <span class="rail-label">Vuelo libre</span>
+  <button type="button" class="rail-item" data-free-toggle aria-label={t.free}>
+    <span class="rail-label">{t.free}</span>
     <span class="rail-dot rail-dot--icon" aria-hidden="true">✈</span>
   </button>
   <div class="relative">
-    <button type="button" class="rail-item" data-sound-toggle aria-pressed="false" aria-label="Sonido">
-      <span class="rail-label" data-sound-label>Sonido: apagado</span>
+    <button type="button" class="rail-item" data-sound-toggle aria-pressed="false" aria-label={t.sound}>
+      <span class="rail-label" data-sound-label>{t.soundOff}</span>
       <span class="rail-dot rail-dot--icon" aria-hidden="true">♪</span>
     </button>
     <!-- Brief hint on every load: browsers keep audio off until the visitor turns it on -->
     <p class="sound-hint" data-sound-hint hidden role="status">
-      <span class="font-semibold">El sonido está apagado.</span> Activalo acá para escuchar el motor y la radio.
+      <span class="font-semibold">{t.hintStrong}</span> {t.hint}
     </p>
   </div>
 </nav>
@@ -119,23 +152,23 @@ const comms = {
 </div>
 
 <!-- Free-flight controls -->
-<div class="flight-free" data-free-panel hidden role="dialog" aria-label="Vuelo libre">
+<div class="flight-free" data-free-panel hidden role="dialog" aria-label={t.free}>
   <div class="hud-panel p-4 flex flex-wrap items-center gap-4 justify-center">
     <div class="grid grid-cols-3 gap-1 font-mono text-xs" aria-hidden="true">
       <span></span><kbd class="key">W</kbd><span></span>
       <kbd class="key">A</kbd><kbd class="key">S</kbd><kbd class="key">D</kbd>
     </div>
-    <p class="text-sm text-[var(--color-text-secondary)] max-w-56">Volá con WASD o las flechas, o mantené apretado y arrastrá. Acercate a una isla.</p>
+    <p class="text-sm text-[var(--color-text-secondary)] max-w-56">{t.freeHelp}</p>
     <canvas class="hidden md:block w-24 h-24" width="96" height="96" data-minimap aria-hidden="true"></canvas>
     <div class="flex flex-col gap-2">
       <a href="#" class="hud-btn hud-btn--primary" data-near-link hidden></a>
-      <button type="button" class="hud-btn" data-free-exit>Volver al portfolio (Esc)</button>
+      <button type="button" class="hud-btn" data-free-exit>{t.exit}</button>
     </div>
   </div>
 </div>
 
-<script define:vars={{ stops, comms }}>
-  window.__flight = { stops, comms };
+<script define:vars={{ stops, comms, ui }}>
+  window.__flight = { stops, comms, ui };
 </script>
 
 <script>
@@ -144,7 +177,8 @@ const comms = {
 
   interface Stop { id: string; label: string }
   interface Comms { launch: string; takeoff: string; arrive: string[]; complete: string; free: string }
-  const { stops, comms } = (window as unknown as { __flight: { stops: Stop[]; comms: Comms } }).__flight;
+  interface Ui { soundOff: string; soundOn: string; goTo: string }
+  const { stops, comms, ui } = (window as unknown as { __flight: { stops: Stop[]; comms: Comms; ui: Ui } }).__flight;
   const host = document.querySelector<HTMLElement>('[data-flight-host]');
   const hud = document.querySelector<HTMLElement>('[data-flight-hud]');
   const freePanel = document.querySelector<HTMLElement>('[data-free-panel]');
@@ -310,7 +344,7 @@ const comms = {
         nearLink.hidden = i === null;
         if (i !== null) {
           nearLink.href = `#${stops[i].id}`;
-          nearLink.textContent = `Ir a ${stops[i].label} →`;
+          nearLink.textContent = `${ui.goTo} ${stops[i].label} →`;
         }
       },
       onFreeChange: setFreeUI,
@@ -346,7 +380,7 @@ const comms = {
       const on = soundToggle.getAttribute('aria-pressed') !== 'true';
       soundToggle.setAttribute('aria-pressed', String(on));
       soundToggle.classList.toggle('is-on', on);
-      if (soundLabel) soundLabel.textContent = on ? 'Sonido: encendido' : 'Sonido: apagado';
+      if (soundLabel) soundLabel.textContent = on ? ui.soundOn : ui.soundOff;
       sound?.setEnabled(on);
     });
 

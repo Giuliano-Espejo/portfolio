@@ -1,5 +1,26 @@
 ---
 import SectionHeading from './SectionHeading.astro';
+import { cvFile, langFromLocale } from '../i18n';
+
+const lang = langFromLocale(Astro.currentLocale);
+const t = {
+  es: {
+    title: 'Contacto',
+    tag: 'Baliza 05 // Canal abierto',
+    pitch: '¿Tenés un proyecto backend o una posición abierta? Escribime y te respondo a la brevedad.',
+    write: 'Escribime',
+    cv: 'Descargar CV (PDF)',
+    cvName: 'Giuliano_Espejo_CV.pdf',
+  },
+  en: {
+    title: 'Contact',
+    tag: 'Beacon 05 // Open channel',
+    pitch: 'Got a backend project or an open position? Drop me a line and I’ll get back to you shortly.',
+    write: 'Email me',
+    cv: 'Download CV (PDF)',
+    cvName: 'Giuliano_Espejo_CV_EN.pdf',
+  },
+}[lang];
 
 const channels = [
   { label: 'Email', value: 'espejogiuliano@gmail.com', href: 'mailto:espejogiuliano@gmail.com' },
@@ -9,13 +30,13 @@ const channels = [
 ---
 
 <section id="contacto" class="max-w-4xl mx-auto px-4 py-12 animate-section">
-  <SectionHeading index="06" title="Contacto" tag="Baliza 05 // Canal abierto" />
+  <SectionHeading index="06" title={t.title} tag={t.tag} />
   <div class="card gradient-border relative p-6 md:p-10">
     <div class="absolute inset-0 -z-10 overflow-hidden rounded-[inherit]" aria-hidden="true">
       <div class="absolute -top-24 -right-24 h-72 w-72 rounded-full opacity-40" style="background: radial-gradient(circle, var(--g3), transparent 70%)"></div>
     </div>
     <p class="text-xl md:text-2xl font-display font-medium text-[var(--color-text-primary)] mb-8 max-w-xl">
-      ¿Tenés un proyecto backend o una posición abierta? Escribime y te respondo a la brevedad.
+      {t.pitch}
     </p>
     <dl class="grid grid-cols-1 md:grid-cols-3 gap-6">
       {channels.map(({ label, value, href, external }) => (
@@ -36,11 +57,11 @@ const channels = [
     <div class="mt-8 pt-6 border-t border-[var(--color-border)] flex flex-wrap gap-3">
       <a href="mailto:espejogiuliano@gmail.com" class="btn-gradient inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium">
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-        Escribime
+        {t.write}
       </a>
-      <a href="/Giuliano_Espejo_CV.pdf" download="Giuliano_Espejo_CV.pdf" class="inline-flex items-center gap-2 px-6 py-3 border border-[var(--color-border)] text-[var(--color-text-primary)] rounded-lg hover:bg-[var(--color-bg-secondary)] transition-colors font-medium">
+ <a href={cvFile[lang]} download={t.cvName} class="inline-flex items-center gap-2 px-6 py-3 border border-[var(--color-border)] text-[var(--color-text-primary)] rounded-lg hover:bg-[var(--color-bg-secondary)] transition-colors font-medium">
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-        Descargar CV (PDF)
+        {t.cv}
       </a>
     </div>
   </div>

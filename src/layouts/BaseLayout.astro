@@ -3,6 +3,7 @@ import "@fontsource-variable/hanken-grotesk";
 import "@fontsource-variable/space-grotesk";
 import "@fontsource/jetbrains-mono";
 import "../styles/global.css";
+import { htmlLang, langFromLocale, ogLocale, pathIn, type Lang } from "../i18n";
 
 export interface Props {
   title?: string;
@@ -15,11 +16,31 @@ export interface Props {
   jsonLd?: Record<string, unknown>[];
 }
 
-const { title = 'Giuliano Espejo Mezzabotta — Backend Developer Java', description = 'Giuliano Espejo Mezzabotta, Backend Developer Java. APIs con Spring Boot y PostgreSQL en proyectos reales de pagos, reservas y stock. Profesor en la UTN.' } = Astro.props;
+const lang: Lang = langFromLocale(Astro.currentLocale);
+const defaults = {
+  es: {
+    title: 'Giuliano Espejo Mezzabotta — Backend Developer Java',
+    description: 'Giuliano Espejo Mezzabotta, Backend Developer Java. APIs con Spring Boot y PostgreSQL en proyectos reales de pagos, reservas y stock. Profesor en la UTN.',
+    person: 'Backend Developer Java especializado en Spring Boot, PostgreSQL y APIs REST, con proyectos reales de pagos, reservas y stock. Profesor de Programación en la UTN.',
+    disambiguation: 'Desarrollador Backend Java, Técnico Universitario en Programación por UTN. No está relacionado con la política. No es el diputado nacional.',
+  },
+  en: {
+    title: 'Giuliano Espejo Mezzabotta — Java Backend Developer',
+    description: 'Giuliano Espejo Mezzabotta, Java Backend Developer. Spring Boot and PostgreSQL APIs for real payments, bookings and stock projects. Programming teacher at UTN.',
+    person: 'Java Backend Developer specialized in Spring Boot, PostgreSQL and REST APIs, with real projects in payments, bookings and stock. Programming teacher at UTN (Argentina).',
+    disambiguation: 'Java Backend Developer, university programming technician from UTN (Argentina). Not related to politics. Not the national deputy.',
+  },
+}[lang];
+const { title = defaults.title, description = defaults.description } = Astro.props;
 const { image = '/og/home.jpg', imageAlt = 'Giuliano Espejo Mezzabotta — Backend Developer', type = 'website' } = Astro.props;
 const ogImage = Astro.site ? new URL(image, Astro.site).href : image;
 const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : Astro.url.pathname;
 const homeUrl = Astro.site ? Astro.site.href : '/';
+// The same page in each language, for hreflang
+const alternates = (['es', 'en'] as Lang[]).map((l) => ({
+  lang: l,
+  href: Astro.site ? new URL(pathIn(Astro.url.pathname, l), Astro.site).href : pathIn(Astro.url.pathname, l),
+}));
 const { jsonLd = [] } = Astro.props;
 
 // Stable ids so page-level nodes can point at the person/site (e.g. a project's author)
@@ -34,9 +55,9 @@ const structuredData = {
       givenName: 'Giuliano',
       familyName: 'Espejo Mezzabotta',
       additionalName: 'Mezzabotta',
-      disambiguatingDescription: 'Desarrollador Backend Java, Técnico Universitario en Programación por UTN. No está relacionado con la política. No es el diputado nacional.',
+      disambiguatingDescription: defaults.disambiguation,
       jobTitle: 'Backend Developer',
-      description: 'Backend Developer Java especializado en Spring Boot, PostgreSQL y APIs REST, con proyectos reales de pagos, reservas y stock. Profesor de Programación en la UTN.',
+      description: defaults.person,
       url: homeUrl.replace(/\/$/, ''),
       image: new URL('/og/home.jpg', homeUrl).href,
       sameAs: [
@@ -52,7 +73,7 @@ const structuredData = {
       '@id': `${homeUrl}#website`,
       url: homeUrl,
       name: 'Giuliano Espejo Mezzabotta — Backend Developer',
-      inLanguage: 'es-AR',
+      inLanguage: ['es-AR', 'en-US'],
       publisher: { '@id': personId },
     },
     ...jsonLd,
@@ -61,7 +82,7 @@ const structuredData = {
 ---
 
 <!doctype html>
-<html lang="es" class="dark">
+<html lang={htmlLang[lang]} class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -73,6 +94,8 @@ const structuredData = {
 
     <!-- Canonical URL -->
     <link rel="canonical" href={canonicalUrl} />
+    {alternates.map((a) => <link rel="alternate" hreflang={htmlLang[a.lang]} href={a.href} />)}
+    <link rel="alternate" hreflang="x-default" href={alternates[0].href} />
 
     <!-- Open Graph / Social sharing -->
     <meta property="og:title" content={title} />
@@ -85,7 +108,8 @@ const structuredData = {
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:type" content={type} />
     <meta property="og:site_name" content="Giuliano Espejo Mezzabotta" />
-    <meta property="og:locale" content="es_AR" />
+    <meta property="og:locale" content={ogLocale[lang]} />
+    <meta property="og:locale:alternate" content={ogLocale[lang === 'es' ? 'en' : 'es']} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />

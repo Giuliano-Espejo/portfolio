@@ -2,6 +2,7 @@
 import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
 import Tag from './Tag.astro';
+import { langFromLocale } from '../i18n';
 
 export interface Props {
   title: string;
@@ -30,6 +31,9 @@ const covers = [
   'radial-gradient(circle at 50% 110%, var(--g3), transparent 60%), radial-gradient(circle at 10% 10%, var(--g2), transparent 50%)',
 ];
 const cover = covers[variant % covers.length];
+const t = langFromLocale(Astro.currentLocale) === 'en'
+  ? { read: 'Read the case study', view: 'View project', code: 'Code', of: 'for' }
+  : { read: 'Leer el caso', view: 'Ver proyecto', code: 'Código', of: 'de' };
 const initials = title.split(/\s+/).filter(w => /^[A-Za-zÁÉÍÓÚ]/.test(w)).slice(0, 2).map(w => w[0]).join('');
 ---
 
@@ -58,22 +62,22 @@ const initials = title.split(/\s+/).filter(w => /^[A-Za-zÁÉÍÓÚ]/.test(w)).s
       <div class="flex flex-wrap gap-x-4 gap-y-2">
         {caseStudy && (
           <a href={caseStudy} class="text-sm text-[var(--color-accent)] hover:underline font-medium">
-            Leer el caso<span class="sr-only"> {title}</span> →
+            {t.read}<span class="sr-only"> {title}</span> →
           </a>
         )}
         {link && (
           <a href={link} target="_blank" rel="noopener noreferrer" class="text-sm text-[var(--color-accent)] hover:underline font-medium">
-            {linkLabel || 'Ver proyecto'}<span class="sr-only"> de {title}</span> ↗
+            {linkLabel || t.view}<span class="sr-only"> {t.of} {title}</span> ↗
           </a>
         )}
         {links.map(extra => (
           <a href={extra.href} target="_blank" rel="noopener noreferrer" class="text-sm text-[var(--color-accent)] hover:underline font-medium">
-            {extra.label}<span class="sr-only"> de {title}</span> ↗
+            {extra.label}<span class="sr-only"> {t.of} {title}</span> ↗
           </a>
         ))}
         {repo && (
           <a href={repo} target="_blank" rel="noopener noreferrer" class="text-sm text-[var(--color-accent)] hover:underline font-medium">
-            Código<span class="sr-only"> de {title}</span> ↗
+            {t.code}<span class="sr-only"> {t.of} {title}</span> ↗
           </a>
         )}
       </div>

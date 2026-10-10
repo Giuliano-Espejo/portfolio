@@ -1328,3 +1328,23 @@ main[data-flight] .timeline-dot.is-active {
 .sound-hint.is-shown { opacity: 1; transform: translate(0, -50%); }
 .sound-hint[hidden] { display: none; }
 @media (max-width: 767px) { .sound-hint { display: none; } }
+
+/* ES / EN toggle in the header */
+.lang-toggle {
+  display: inline-flex;
+  padding: 2px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+}
+.lang-toggle a {
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  color: rgba(241, 245, 249, 0.75);
+  transition: background-color 0.2s, color 0.2s;
+}
+.lang-toggle a:hover { color: #fff; }
+.lang-toggle a[aria-current='true'] { background: #e2532d; color: #fffaf2; font-weight: 700; }
+.lang-toggle a:focus-visible { outline: 2px solid #ff8a5c; outline-offset: 2px; }

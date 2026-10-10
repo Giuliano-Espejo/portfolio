@@ -5,9 +5,22 @@ import SectionHeading from './SectionHeading.astro';
 import donInodorosImg from '../assets/projects/don-inodoros.png';
 import burgameImg from '../assets/projects/burgame.png';
 import pastaFiorellaImg from '../assets/projects/pasta-fiorella.png';
-import { frontmatter as pastaFiorella } from '../case-studies/pasta-fiorella.md';
-import { frontmatter as burgame } from '../case-studies/burgame.md';
-import { frontmatter as donInodoros } from '../case-studies/don-inodoros.md';
+import { langFromLocale, localize } from '../i18n';
+
+// Card copy comes from each case study's frontmatter, in the page's language
+interface CaseFrontmatter { title: string; teaser: string; imageAlt?: string; demos: { label: string; href: string }[] }
+const lang = langFromLocale(Astro.currentLocale);
+const studies = lang === 'en'
+  ? import.meta.glob<{ frontmatter: CaseFrontmatter }>('../case-studies/en/*.md', { eager: true })
+  : import.meta.glob<{ frontmatter: CaseFrontmatter }>('../case-studies/*.md', { eager: true });
+const fm = (slug: string) => Object.entries(studies).find(([p]) => p.endsWith(`/${slug}.md`))![1].frontmatter;
+const donInodoros = fm('don-inodoros');
+const burgame = fm('burgame');
+const pastaFiorella = fm('pasta-fiorella');
+const en = lang === 'en';
+const t = en
+  ? { title: 'Projects', tag: 'Beacon 03 // Systems in production', gaming: 'Gaming bookings', orders: 'Online orders', site: 'Site', store: 'Store', dashboard: 'Dashboard' }
+  : { title: 'Proyectos', tag: 'Baliza 03 // Sistemas en producción', gaming: 'Reservas gaming', orders: 'Pedidos online', site: 'Sitio', store: 'Tienda', dashboard: 'Dashboard' };
 
 // To add a screenshot: put it in src/assets/projects/, import it and pass `image` (+ `imageAlt`).
 // `repo` adds a "Código ↗" link; `caseStudy` links to an internal write-up page.
@@ -18,34 +31,34 @@ const projects = [
     tags: ['Java 21', 'Spring Boot 4', 'Spring Security', 'PostgreSQL', 'Flyway', 'WebSocket', 'Docker'],
     image: donInodorosImg,
     imageAlt: donInodoros.imageAlt,
-    caseStudy: '/proyectos/don-inodoros',
+    caseStudy: localize('/proyectos/don-inodoros', lang),
   },
   {
-    title: `${burgame.title} — Reservas gaming`,
+    title: `${burgame.title} — ${t.gaming}`,
     description: burgame.teaser,
     tags: ['Java 21', 'Spring Boot 3.5', 'Spring Security', 'PostgreSQL', 'Mercado Pago', 'Docker'],
     image: burgameImg,
     imageAlt: burgame.imageAlt,
-    caseStudy: '/proyectos/burgame',
+    caseStudy: localize('/proyectos/burgame', lang),
     link: burgame.demos[0].href,
-    linkLabel: 'Sitio',
+    linkLabel: t.site,
   },
   {
-    title: `${pastaFiorella.title} — Pedidos online`,
+    title: `${pastaFiorella.title} — ${t.orders}`,
     description: pastaFiorella.teaser,
     tags: ['Java 17', 'Spring Boot 3', 'PostgreSQL', 'Mercado Pago', 'Docker', 'json-server'],
     image: pastaFiorellaImg,
-    imageAlt: 'Home de la tienda online de Pasta Fiorella',
-    caseStudy: '/proyectos/pasta-fiorella',
+    imageAlt: pastaFiorella.imageAlt,
+    caseStudy: localize('/proyectos/pasta-fiorella', lang),
     link: pastaFiorella.demos[0].href,
-    linkLabel: 'Tienda',
-    links: [{ label: 'Dashboard', href: pastaFiorella.demos[1].href }],
+    linkLabel: t.store,
+    links: [{ label: t.dashboard, href: pastaFiorella.demos[1].href }],
   },
 ];
 ---
 
 <section id="proyectos" class="max-w-4xl mx-auto px-4 py-12">
-  <SectionHeading index="03" title="Proyectos" tag="Baliza 03 // Sistemas en producción" />
+  <SectionHeading index="03" title={t.title} tag={t.tag} />
   <div class="projects-track grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     {projects.map((project, i) => (
       <div class="animate-card"><ProjectCard {...project} variant={i} /></div>

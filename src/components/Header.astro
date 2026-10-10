@@ -1,19 +1,24 @@
 ---
+import { langFromLocale, localize, pathIn, type Lang } from '../i18n';
 
-const navLinks = [
-  { href: '/#sobre-mi', label: 'Sobre mí' },
-  { href: '/#experiencia', label: 'Experiencia' },
-  { href: '/#proyectos', label: 'Proyectos' },
-  { href: '/#skills', label: 'Skills' },
-  { href: '/#contacto', label: 'Contacto' },
+const lang = langFromLocale(Astro.currentLocale);
+const copy = {
+  es: { nav: ['Sobre mí', 'Experiencia', 'Proyectos', 'Skills', 'Contacto'], main: 'Principal', menu: 'Abrir menú', langs: 'Idioma' },
+  en: { nav: ['About', 'Experience', 'Projects', 'Skills', 'Contact'], main: 'Main', menu: 'Open menu', langs: 'Language' },
+}[lang];
+const ids = ['sobre-mi', 'experiencia', 'proyectos', 'skills', 'contacto'];
+const navLinks = ids.map((id, i) => ({ href: localize(`/#${id}`, lang), label: copy.nav[i] }));
+const languages: { code: Lang; label: string; name: string }[] = [
+  { code: 'es', label: 'ES', name: 'Español' },
+  { code: 'en', label: 'EN', name: 'English' },
 ];
 ---
 
 <header class="sticky top-0 z-50 bg-[color-mix(in_srgb,var(--color-bg-primary)_70%,transparent)] backdrop-blur-md border-b border-[var(--color-border)]">
   <div class="scroll-progress" data-scroll-progress aria-hidden="true"></div>
   <div class="scroll-plane" aria-hidden="true"></div>
-  <nav class="relative max-w-4xl mx-auto px-4 h-16 flex items-center justify-between" aria-label="Principal">
-    <a href="/" class="font-mono font-semibold text-lg text-[var(--color-text-primary)] hover:text-[var(--color-accent)] transition-colors">
+   <nav class="relative max-w-4xl mx-auto px-4 h-16 flex items-center justify-between" aria-label={copy.main}>
+    <a href={localize('/', lang)} class="font-mono font-semibold text-lg text-[var(--color-text-primary)] hover:text-[var(--color-accent)] transition-colors">
       <span class="text-gradient">GE</span><span class="text-[var(--color-text-secondary)]">.</span>
     </a>
     <div class="flex items-center gap-1 md:gap-4">
@@ -31,11 +36,23 @@ const navLinks = [
           </li>
         ))}
       </ul>
+      <!-- Language toggle: the same page in the other language -->
+      <div class="lang-toggle" role="group" aria-label={copy.langs}>
+        {languages.map((l) => (
+          <a
+            href={pathIn(Astro.url.pathname, l.code)}
+            hreflang={l.code}
+            lang={l.code}
+            aria-label={l.name}
+            aria-current={l.code === lang ? 'true' : undefined}
+          >{l.label}</a>
+        ))}
+      </div>
       <button
         type="button"
         popovertarget="site-nav"
         class="site-nav-toggle md:hidden p-2 rounded-lg hover:bg-[var(--color-border)] transition-colors cursor-pointer"
-        aria-label="Abrir menú"
+        aria-label={copy.menu}
       >
         <svg class="icon-open w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16" /></svg>
         <svg class="icon-close w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" d="M6 6l12 12M18 6L6 18" /></svg>

@@ -1,0 +1,365 @@
+---
+// One case study page (Spanish or English, from the route's locale). The routes in src/pages pick the
+// markdown and the "next mission"; the story lives in the frontmatter and renders as cards, while the
+// markdown body holds the "how it works" diagrams (```mermaid blocks).
+// Styled as a "mission log" over a daytime sky, matching the home's GE-01 flight (CSS only, no 3D).
+import type { ImageMetadata, MarkdownInstance } from 'astro';
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from './Header.astro';
+import Footer from './Footer.astro';
+import SectionHeading from './SectionHeading.astro';
+import Tag from './Tag.astro';
+import SkyClouds from './SkyClouds.astro';
+import type { CaseStudy, NextMission } from '../case-study';
+import { htmlLang, langFromLocale, localize } from '../i18n';
+
+export interface Props {
+  study: MarkdownInstance<CaseStudy>;
+  next?: NextMission;
+}
+
+const { study, next } = Astro.props;
+const { Content } = study;
+const {
+  title, subtitle, description, summary, period, meta, stack, problems, solutions, decisions, learned,
+  roleNote, demos = [], demoNote, image, imageAlt, imageUrl, stats = [],
+} = study.frontmatter;
+
+const lang = langFromLocale(Astro.currentLocale);
+const t = lang === 'en'
+  ? {
+      back: 'Back to the hangar', log: 'Mission log', home: 'Home', projects: 'Projects', learned: 'What I learned',
+      nextMission: 'Next mission', more: 'More projects', leg: 'Leg',
+      sections: { problem: ['The problem', 'Turbulence'], solution: ['The solution', 'Flight plan'], how: ['How it works', 'Route'], decisions: ['Key decisions', 'Manoeuvres'], sheet: ['Tech sheet', 'Aircraft sheet'] },
+    }
+  : {
+      back: 'Volver al hangar', log: 'Bitácora de misión', home: 'Inicio', projects: 'Proyectos', learned: 'Lo que aprendí',
+      nextMission: 'Próxima misión', more: 'Más proyectos', leg: 'Tramo',
+      sections: { problem: ['El problema', 'Turbulencia'], solution: ['La solución', 'Plan de vuelo'], how: ['Cómo funciona', 'Ruta'], decisions: ['Decisiones clave', 'Maniobras'], sheet: ['Ficha técnica', 'Ficha de la aeronave'] },
+    };
+
+const projectImages = import.meta.glob<{ default: ImageMetadata }>('../assets/projects/*.{png,jpg,jpeg,webp}', { eager: true });
+const screenshot = image ? projectImages[`../assets/projects/${image}`]?.default : undefined;
+if (image && !screenshot) {
+  throw new Error(`Case study "${title}": image "${image}" not found in src/assets/projects/`);
+}
+
+// Structured data: breadcrumb trail + the project as a CreativeWork authored by the site's Person
+const site = Astro.site ?? new URL(Astro.url.origin);
+const pageUrl = new URL(Astro.url.pathname, site).href;
+const jsonLd = [
+  {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: t.home, item: new URL(localize('/', lang), site).href },
+      { '@type': 'ListItem', position: 2, name: t.projects, item: new URL(localize('/#proyectos', lang), site).href },
+      { '@type': 'ListItem', position: 3, name: title, item: pageUrl },
+    ],
+  },
+  {
+    '@type': 'CreativeWork',
+    '@id': `${pageUrl}#project`,
+    name: title,
+    headline: `${title}: ${subtitle}`,
+    description,
+    url: pageUrl,
+    image: new URL(`/og/${Astro.params.slug}.jpg`, site).href,
+    inLanguage: htmlLang[lang],
+    author: { '@id': new URL('/#person', site).href },
+    keywords: stack.join(', '),
+  },
+];
+
+// Section numbers follow the order they appear in; each leg of the "flight" gets a log tag
+const order = ['problem', 'solution', 'how', 'decisions', 'sheet'] as const;
+type Key = (typeof order)[number];
+const num = (key: Key) => String(order.indexOf(key) + 1).padStart(2, '0');
+const name = (key: Key) => t.sections[key][0];
+const tag = (key: Key) => `${t.leg} ${num(key)} // ${t.sections[key][1]}`;
+const hangar = localize('/#proyectos', lang);
+---
+
+<BaseLayout
+  title={`${title} | Giuliano Espejo Mezzabotta`}
+  description={description}
+  image={`/og/${Astro.params.slug}.jpg`}
+  imageAlt={`${title}: ${subtitle}`}
+  type="article"
+  jsonLd={jsonLd}
+>
+  <!-- Daytime sky with drifting clouds (decorative) -->
+  <SkyClouds />
+  <Header />
+  <main class="case-page max-w-4xl mx-auto px-4 pt-10 md:pt-14">
+    <!-- Mission briefing -->
+    <section class="paper-card case-hero mb-8">
+      <svg class="case-route" viewBox="0 0 220 90" aria-hidden="true">
+        <path d="M6 80 C 60 78, 90 30, 150 34 S 200 18, 214 10" fill="none" stroke="#2f7bc0" stroke-width="2" stroke-dasharray="5 6" stroke-linecap="round" />
+        <g transform="translate(204 13) rotate(-25) scale(0.95)">
+          <path d="M16 2C17.4 2 18 3.6 18 5L18 13L29 16L29 18.5L18 17.5L17.6 25L21 27L21 29L16 28L11 29L11 27L14.4 25L14 17.5L3 18.5L3 16L14 13L14 5C14 3.6 14.6 2 16 2Z" transform="translate(-16 -16) rotate(90 16 16)" fill="#e2532d" stroke="#1c2b45" stroke-width="1.3" stroke-linejoin="round" />
+        </g>
+      </svg>
+
+      <a href={hangar} class="hero-fade inline-flex items-center gap-2 mb-6 font-mono text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-colors">
+        <span aria-hidden="true">←</span> {t.back}
+      </a>
+
+      <p class="hero-fade hud-label mb-3" style="--delay: 50ms">[{t.log} // {period}]</p>
+      <h1 class="font-display text-4xl md:text-6xl font-bold tracking-tight leading-[1.04] mb-3 text-[var(--color-text-primary)]">
+        <span class="reveal-word"><span>{title}</span></span>
+      </h1>
+      <p class="hero-fade text-xl md:text-2xl font-display font-medium text-[var(--color-accent)] mb-5" style="--delay: 250ms">{subtitle}</p>
+      <p class="hero-fade text-lg leading-relaxed text-[var(--color-text-secondary)] max-w-2xl" style="--delay: 350ms">{summary}</p>
+
+      {demos.length > 0 && (
+        <div class="hero-fade mt-7" style="--delay: 450ms">
+          <div class="flex flex-wrap gap-3">
+            {demos.map((demo, i) => (
+              <a
+                href={demo.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                class:list={[
+                  'inline-flex items-center gap-2 px-6 py-2.5 rounded-lg font-medium transition-colors',
+                  i === 0 ? 'btn-gradient' : 'border border-[#cdbfa6] text-[var(--color-text-primary)] hover:border-[var(--color-accent)]',
+                ]}
+              >
+                {demo.label}
+                <span aria-hidden="true">↗</span>
+              </a>
+            ))}
+          </div>
+          {demoNote && <p class="mt-3 text-sm text-[var(--color-text-secondary)]">{demoNote}</p>}
+        </div>
+      )}
+    </section>
+
+    {screenshot && (
+      <figure class="hero-fade paper-card case-shot mb-8" style="--delay: 550ms">
+        <div class="flex items-center gap-1.5 px-4 py-3 border-b border-[var(--color-border)]" aria-hidden="true">
+          <span class="h-2.5 w-2.5 rounded-full bg-[#e2532d]"></span>
+          <span class="h-2.5 w-2.5 rounded-full bg-[#f0894a]"></span>
+          <span class="h-2.5 w-2.5 rounded-full bg-[#2f7bc0]"></span>
+          {imageUrl && <span class="ml-3 font-mono text-xs text-[var(--color-text-secondary)] truncate">{imageUrl}</span>}
+        </div>
+        <Image
+          src={screenshot}
+          alt={imageAlt ?? title}
+          widths={[640, 960, 1360]}
+          sizes="(min-width: 896px) 864px, calc(100vw - 2rem)"
+          loading="eager"
+          class="w-full h-auto"
+        />
+      </figure>
+    )}
+
+    {stats.length > 0 && (
+      <dl class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-16">
+        {stats.map(stat => (
+          <div class="paper-card case-stat p-5 text-center animate-card flex flex-col-reverse">
+            <dt class="mt-1 text-sm text-[var(--color-text-secondary)]">{stat.label}</dt>
+            <dd class="font-display text-3xl md:text-4xl font-bold text-[var(--color-accent)]">{stat.value}</dd>
+          </div>
+        ))}
+      </dl>
+    )}
+
+    <!-- Problem -->
+    <section class="paper-card case-section">
+      <SectionHeading index={num('problem')} title={name('problem')} tag={tag('problem')} />
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {problems.map(item => (
+          <div class="card p-6 animate-card">
+            <span class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[#fbe3da] text-[var(--color-accent)] mb-4" aria-hidden="true">
+              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+            </span>
+            <h3 class="text-lg font-semibold text-[var(--color-text-primary)] mb-2">{item.title}</h3>
+            <p class="text-sm leading-relaxed text-[var(--color-text-secondary)]">{item.text}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Solution -->
+    <section class="paper-card case-section">
+      <SectionHeading index={num('solution')} title={name('solution')} tag={tag('solution')} />
+      {roleNote && (
+        <p class="animate-section -mt-4 mb-6 flex items-start gap-2 text-sm text-[var(--color-text-secondary)]">
+          <span class="font-mono text-[var(--color-highlight)]" aria-hidden="true">&gt;</span>
+          <span>{roleNote}</span>
+        </p>
+      )}
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {solutions.map(item => (
+          <div class="card p-6 animate-card">
+            <span class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[#2f7bc0] text-white mb-4" aria-hidden="true">
+              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            </span>
+            <h3 class="text-lg font-semibold text-[var(--color-text-primary)] mb-2">{item.title}</h3>
+            <p class="text-sm leading-relaxed text-[var(--color-text-secondary)]">{item.text}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- How it works: markdown body with Mermaid diagrams -->
+    <section class="paper-card case-section">
+      <SectionHeading index={num('how')} title={name('how')} tag={tag('how')} />
+      <article class="prose-case animate-section">
+        <Content />
+      </article>
+    </section>
+
+    <!-- Decisions -->
+    <section class="paper-card case-section">
+      <SectionHeading index={num('decisions')} title={name('decisions')} tag={tag('decisions')} />
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {decisions.map((item, i) => (
+          <div class="card p-6 animate-card">
+            <span class="font-mono text-sm text-[var(--color-accent)]" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+            <h3 class="mt-2 mb-2 text-lg font-semibold text-[var(--color-text-primary)]">{item.title}</h3>
+            <p class="text-sm leading-relaxed text-[var(--color-text-secondary)]">{item.text}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Tech sheet + what I learned -->
+    <section class="paper-card case-section">
+      <SectionHeading index={num('sheet')} title={name('sheet')} tag={tag('sheet')} />
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div class="card p-6 md:col-span-3 animate-card">
+          <dl class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
+            {meta.map(item => (
+              <div>
+                <dt class="font-mono text-xs uppercase tracking-wider text-[var(--color-text-secondary)] mb-1">{item.label}</dt>
+                <dd class="font-medium text-[var(--color-text-primary)]">{item.value}</dd>
+              </div>
+            ))}
+          </dl>
+          <p class="font-mono text-xs uppercase tracking-wider text-[var(--color-text-secondary)] mb-3">Stack</p>
+          <div class="flex flex-wrap gap-2" data-stagger>
+            {stack.map((tech, i) => <Tag size="md" index={i}>{tech}</Tag>)}
+          </div>
+        </div>
+        <div class="card p-6 md:col-span-2 animate-card">
+          <p class="font-mono text-xs uppercase tracking-wider text-[var(--color-text-secondary)] mb-4">{t.learned}</p>
+          <ul class="space-y-3">
+            {learned.map(item => (
+              <li class="flex gap-3 text-sm leading-relaxed text-[var(--color-text-secondary)]">
+                <span class="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[var(--color-accent)]" aria-hidden="true"></span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <nav class="paper-card case-next flex flex-wrap items-center justify-between gap-4 mb-16" aria-label={t.more}>
+      <a href={hangar} class="inline-flex items-center gap-2 font-mono text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-colors">
+        <span aria-hidden="true">←</span> {t.back}
+      </a>
+      {next && (
+        <a href={localize(`/proyectos/${next.slug}`, lang)} class="group inline-flex flex-col items-end text-right">
+          <span class="hud-label">{t.nextMission}</span>
+          <span class="font-display text-lg font-semibold text-[var(--color-text-primary)] group-hover:text-[var(--color-accent)] transition-colors">{next.title} <span aria-hidden="true">→</span></span>
+        </a>
+      )}
+    </nav>
+  </main>
+  <Footer />
+</BaseLayout>
+
+<script>
+  // Render ```mermaid blocks as themed SVG diagrams; mermaid is only downloaded when a page has one.
+  const blocks = [...document.querySelectorAll<HTMLElement>('.prose-case pre')].filter(
+    (pre) => pre.dataset.language === 'mermaid' || pre.querySelector('code.language-mermaid') || pre.classList.contains('mermaid'),
+  );
+
+  const en = document.documentElement.lang.startsWith('en');
+  const copy = en
+    ? { diagram: 'Diagram', how: 'how it works', swipe: 'Swipe the diagram to see all of it →' }
+    : { diagram: 'Diagrama', how: 'cómo funciona', swipe: 'Deslizá el diagrama para verlo completo →' };
+
+  if (blocks.length > 0) {
+    const diagrams = blocks.map((pre) => {
+      const figure = document.createElement('figure');
+      figure.className = 'mermaid-diagram';
+      figure.dataset.source = pre.textContent ?? '';
+      figure.setAttribute('role', 'img');
+      // Name the graphic after the heading it illustrates
+      let prev = pre.previousElementSibling;
+      while (prev && !/^H[2-4]$/.test(prev.tagName)) prev = prev.previousElementSibling;
+      figure.setAttribute('aria-label', `${copy.diagram}: ${prev?.textContent?.trim() ?? copy.how}`);
+      pre.replaceWith(figure);
+      return figure;
+    });
+
+    const { default: mermaid } = await import('mermaid');
+    let renderId = 0;
+
+    const render = async () => {
+      // Read the paper palette from the article itself (the page root keeps the dark tokens)
+      const css = getComputedStyle(document.querySelector('.prose-case') ?? document.documentElement);
+      const v = (name: string) => css.getPropertyValue(name).trim();
+      mermaid.initialize({
+        startOnLoad: false,
+        securityLevel: 'strict',
+        theme: 'base',
+        fontFamily: "'Hanken Grotesk Variable', sans-serif",
+        themeVariables: {
+          darkMode: false,
+          background: 'transparent',
+          fontSize: '15px',
+          primaryColor: v('--color-card-bg'),
+          primaryBorderColor: v('--color-highlight'),
+          primaryTextColor: v('--color-text-primary'),
+          secondaryColor: v('--color-bg-secondary'),
+          tertiaryColor: v('--color-bg-secondary'),
+          lineColor: v('--color-text-secondary'),
+          textColor: v('--color-text-primary'),
+          edgeLabelBackground: v('--color-bg-primary'),
+          actorBkg: v('--color-card-bg'),
+          actorBorder: v('--color-highlight'),
+          actorTextColor: v('--color-text-primary'),
+          actorLineColor: v('--color-text-secondary'),
+          signalColor: v('--color-text-secondary'),
+          signalTextColor: v('--color-text-primary'),
+          sequenceNumberColor: '#ffffff',
+          labelBoxBkgColor: v('--color-card-bg'),
+          labelBoxBorderColor: v('--color-highlight'),
+          noteBkgColor: '#fbe3da',
+          noteTextColor: v('--color-text-primary'),
+          noteBorderColor: v('--color-accent'),
+        },
+      });
+      for (const figure of diagrams) {
+        const { svg } = await mermaid.render(`mermaid-${renderId++}`, figure.dataset.source ?? '');
+        figure.innerHTML = svg;
+      }
+    };
+
+    // On narrow screens diagrams scroll sideways; say so only when one actually overflows
+    const updateHints = () => {
+      diagrams.forEach((figure) => {
+        const scrollable = figure.scrollWidth > figure.clientWidth + 1;
+        const next = figure.nextElementSibling;
+        const hint = next?.classList.contains('diagram-hint') ? next : null;
+        if (scrollable && !hint) {
+          const p = document.createElement('p');
+          p.className = 'diagram-hint';
+          p.textContent = copy.swipe;
+          figure.after(p);
+        } else if (!scrollable && hint) {
+          hint.remove();
+        }
+      });
+    };
+
+    await render();
+    updateHints();
+    window.addEventListener('resize', updateHints, { passive: true });
+  }
+</script>
