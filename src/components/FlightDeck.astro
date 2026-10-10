@@ -359,6 +359,13 @@ const ui = { soundOff: t.soundOff, soundOn: t.soundOn, goTo: t.goTo };
     });
     freePanel?.querySelector('[data-free-exit]')?.addEventListener('click', () => flight?.setFree(false));
     nearLink?.addEventListener('click', () => flight?.setFree(false)); // then the anchor scrolls to the section
+    // Any link clicked during free flight (the header nav, the logo…) lands the plane first: free
+    // flight locks scrolling and hides the sections, so the link would otherwise do nothing.
+    // Capture phase, so free flight ends before the browser follows the link.
+    document.addEventListener('click', (e) => {
+      if (!document.documentElement.classList.contains('free-flight')) return;
+      if ((e.target as Element | null)?.closest?.('a[href]')) flight?.setFree(false);
+    }, true);
     // Sound hint: shows a few seconds after the scene is up (every load), then fades out by itself
     const hint = document.querySelector<HTMLElement>('[data-sound-hint]');
     const hideHint = () => {
