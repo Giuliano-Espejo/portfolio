@@ -1,0 +1,58 @@
+---
+// Shared 404 (Vercel serves this one file for every missing path). Spanish by default; the copy
+// switches to English when the missing URL is under /en.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import SkyClouds from '../components/SkyClouds.astro';
+---
+
+<BaseLayout title="Perdiste el rumbo | Giuliano Espejo Mezzabotta" description="La página que buscás no existe." noindex>
+  <SkyClouds />
+  <Header />
+  <main id="contenido" class="case-page max-w-2xl mx-auto px-4 pt-16 md:pt-24 pb-24">
+    <section class="paper-card case-hero text-center" data-404>
+      <svg class="mx-auto mb-6 w-28 h-auto" viewBox="0 0 64 32" aria-hidden="true">
+        <g transform="translate(64 0) scale(-1 1) rotate(-12 32 16)">
+          <ellipse cx="4" cy="15" rx="1.6" ry="11" fill="#5b6b82" opacity="0.6" />
+          <path d="M5 13 Q6 9 14 9 L50 11 L60 5 L62 6 L58 14 L60 16 L50 17 L14 19 Q6 19 5 15 Z" fill="#e2532d" stroke="#1c2b45" stroke-width="1.2" stroke-linejoin="round" />
+          <rect x="16" y="5" width="20" height="3" rx="1.5" fill="#c8431f" stroke="#1c2b45" stroke-width="1" />
+          <rect x="15" y="20" width="22" height="3" rx="1.5" fill="#c8431f" stroke="#1c2b45" stroke-width="1" />
+          <path d="M20 8 L20 20 M31 8 L31 20" stroke="#1c2b45" stroke-width="0.9" />
+          <path d="M18 12 Q22 10 26 12 L26 14 L18 14 Z" fill="#7cc4ff" stroke="#1c2b45" stroke-width="0.8" />
+          <circle cx="22" cy="26" r="2.6" fill="#1c2b45" />
+        </g>
+      </svg>
+      <p class="hud-label mb-3" data-t="code">[Error 404 // Fuera de ruta]</p>
+      <h1 class="font-display text-4xl md:text-5xl font-bold tracking-tight text-[var(--color-text-primary)] mb-4" data-t="title">Perdiste el rumbo</h1>
+      <p class="text-lg leading-relaxed text-[var(--color-text-secondary)] max-w-md mx-auto mb-8" data-t="text">
+        La baliza que buscás no existe o cambió de lugar. Volvé a la base y retomá el vuelo.
+      </p>
+      <div class="flex flex-wrap justify-center gap-3">
+        <a href="/" class="btn-gradient inline-flex items-center gap-2 px-6 py-2.5 rounded-lg font-medium" data-href-en="/en/" data-t="home">Volver a la base</a>
+        <a href="/#proyectos" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg font-medium border border-[#cdbfa6] text-[var(--color-text-primary)] hover:border-[var(--color-accent)] transition-colors" data-href-en="/en/#proyectos" data-t="projects">Ver proyectos</a>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</BaseLayout>
+
+<script>
+  // Missing page under /en → English copy and links
+  if (/^\/en(\/|$)/.test(location.pathname)) {
+    const en: Record<string, string> = {
+      code: '[Error 404 // Off route]',
+      title: 'Off course',
+      text: "The beacon you're looking for doesn't exist or has moved. Head back to base and resume the flight.",
+      home: 'Back to base',
+      projects: 'View projects',
+    };
+    document.documentElement.lang = 'en-US';
+    document.title = 'Off course | Giuliano Espejo Mezzabotta';
+    document.querySelectorAll<HTMLElement>('[data-404] [data-t]').forEach((el) => {
+      const key = el.dataset.t!;
+      if (en[key]) el.textContent = en[key];
+    });
+    document.querySelectorAll<HTMLAnchorElement>('[data-href-en]').forEach((a) => { a.href = a.dataset.hrefEn!; });
+  }
+</script>

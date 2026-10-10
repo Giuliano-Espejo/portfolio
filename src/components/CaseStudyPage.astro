@@ -64,7 +64,7 @@ const jsonLd = [
     headline: `${title}: ${subtitle}`,
     description,
     url: pageUrl,
-    image: new URL(`/og/${Astro.params.slug}.jpg`, site).href,
+    image: new URL(`/og/${Astro.params.slug}${lang === 'en' ? '-en' : ''}.jpg`, site).href,
     inLanguage: htmlLang[lang],
     author: { '@id': new URL('/#person', site).href },
     keywords: stack.join(', '),
@@ -78,12 +78,14 @@ const num = (key: Key) => String(order.indexOf(key) + 1).padStart(2, '0');
 const name = (key: Key) => t.sections[key][0];
 const tag = (key: Key) => `${t.leg} ${num(key)} // ${t.sections[key][1]}`;
 const hangar = localize('/#proyectos', lang);
+// Social preview: one image per project and language (public/og/<slug>[-en].jpg)
+const ogImage = `/og/${Astro.params.slug}${lang === 'en' ? '-en' : ''}.jpg`;
 ---
 
 <BaseLayout
   title={`${title} | Giuliano Espejo Mezzabotta`}
   description={description}
-  image={`/og/${Astro.params.slug}.jpg`}
+  image={ogImage}
   imageAlt={`${title}: ${subtitle}`}
   type="article"
   jsonLd={jsonLd}
@@ -91,7 +93,7 @@ const hangar = localize('/#proyectos', lang);
   <!-- Daytime sky with drifting clouds (decorative) -->
   <SkyClouds />
   <Header />
-  <main class="case-page max-w-4xl mx-auto px-4 pt-10 md:pt-14">
+  <main id="contenido" class="case-page max-w-4xl mx-auto px-4 pt-10 md:pt-14">
     <!-- Mission briefing -->
     <section class="paper-card case-hero mb-8">
       <svg class="case-route" viewBox="0 0 220 90" aria-hidden="true">
@@ -297,10 +299,11 @@ const hangar = localize('/#proyectos', lang);
       return figure;
     });
 
-    const { default: mermaid } = await import('mermaid');
     let renderId = 0;
 
     const render = async () => {
+      // Mermaid (~200 KB gzipped with its layout engine) is only fetched once a diagram is near
+      const { default: mermaid } = await import('mermaid');
       // Read the paper palette from the article itself (the page root keeps the dark tokens)
       const css = getComputedStyle(document.querySelector('.prose-case') ?? document.documentElement);
       const v = (name: string) => css.getPropertyValue(name).trim();
@@ -358,8 +361,24 @@ const hangar = localize('/#proyectos', lang);
       });
     };
 
-    await render();
-    updateHints();
-    window.addEventListener('resize', updateHints, { passive: true });
+    // Start when the first diagram is within ~600px of the viewport, so opening the page stays light
+    let started = false;
+    const start = async () => {
+      if (started) return;
+      started = true;
+      await render();
+      updateHints();
+      window.addEventListener('resize', updateHints, { passive: true });
+    };
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        io.disconnect();
+        start();
+      }, { rootMargin: '600px 0px' });
+      diagrams.forEach((figure) => io.observe(figure));
+    } else {
+      start();
+    }
   }
 </script>

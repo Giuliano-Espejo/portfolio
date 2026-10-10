@@ -1,5 +1,19 @@
 {
   "redirects": [
     { "source": "/Profile.pdf", "destination": "/Giuliano_Espejo_CV.pdf", "permanent": true }
+  ],
+  "headers": [
+    {
+      "source": "/models/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" }]
+    },
+    {
+      "source": "/og/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" }]
+    },
+    {
+      "source": "/(favicon.svg|favicon.ico|apple-touch-icon.png)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" }]
+    }
   ]
 }

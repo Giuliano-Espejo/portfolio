@@ -2,6 +2,8 @@
 import { langFromLocale, localize, pathIn, type Lang } from '../i18n';
 
 const lang = langFromLocale(Astro.currentLocale);
+// The 404 has no twin page: its toggle goes to each language's home
+const here = /^\/(en\/)?404\/?$/.test(Astro.url.pathname) ? '/' : Astro.url.pathname;
 const copy = {
   es: { nav: ['Sobre mí', 'Experiencia', 'Proyectos', 'Skills', 'Contacto'], main: 'Principal', menu: 'Abrir menú', langs: 'Idioma' },
   en: { nav: ['About', 'Experience', 'Projects', 'Skills', 'Contact'], main: 'Main', menu: 'Open menu', langs: 'Language' },
@@ -40,7 +42,7 @@ const languages: { code: Lang; label: string; name: string }[] = [
       <div class="lang-toggle" role="group" aria-label={copy.langs}>
         {languages.map((l) => (
           <a
-            href={pathIn(Astro.url.pathname, l.code)}
+            href={pathIn(here, l.code)}
             hreflang={l.code}
             lang={l.code}
             aria-label={l.name}

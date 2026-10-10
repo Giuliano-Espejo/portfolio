@@ -2,8 +2,14 @@
 import "@fontsource-variable/hanken-grotesk";
 import "@fontsource-variable/space-grotesk";
 import "@fontsource/jetbrains-mono";
+// The two fonts on screen at first paint (name + body), preloaded so the hero doesn't swap fonts
+import spaceGroteskLatin from "@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url";
+import hankenGroteskLatin from "@fontsource-variable/hanken-grotesk/files/hanken-grotesk-latin-wght-normal.woff2?url";
 import "../styles/global.css";
 import { htmlLang, langFromLocale, ogLocale, pathIn, type Lang } from "../i18n";
+// Cookie-free visit counts and real-user Core Web Vitals (enable both in the Vercel dashboard)
+import Analytics from "@vercel/analytics/astro";
+import SpeedInsights from "@vercel/speed-insights/astro";
 
 export interface Props {
   title?: string;
@@ -14,6 +20,8 @@ export interface Props {
   type?: 'website' | 'article';
   /** Extra schema.org nodes for this page (e.g. BreadcrumbList); merged into the site-wide @graph */
   jsonLd?: Record<string, unknown>[];
+  /** Keep the page out of search results (the 404) */
+  noindex?: boolean;
 }
 
 const lang: Lang = langFromLocale(Astro.currentLocale);
@@ -32,7 +40,7 @@ const defaults = {
   },
 }[lang];
 const { title = defaults.title, description = defaults.description } = Astro.props;
-const { image = '/og/home.jpg', imageAlt = 'Giuliano Espejo Mezzabotta — Backend Developer', type = 'website' } = Astro.props;
+const { image = lang === 'en' ? '/og/home-en.jpg' : '/og/home.jpg', imageAlt = 'Giuliano Espejo Mezzabotta — Backend Developer', type = 'website' } = Astro.props;
 const ogImage = Astro.site ? new URL(image, Astro.site).href : image;
 const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : Astro.url.pathname;
 const homeUrl = Astro.site ? Astro.site.href : '/';
@@ -86,16 +94,23 @@ const structuredData = {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preload" href={spaceGroteskLatin} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={hankenGroteskLatin} as="font" type="font/woff2" crossorigin />
     <meta name="description" content={description} />
+    {Astro.props.noindex && <meta name="robots" content="noindex" />}
     <title>{title}</title>
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
     <!-- Canonical URL -->
-    <link rel="canonical" href={canonicalUrl} />
-    {alternates.map((a) => <link rel="alternate" hreflang={htmlLang[a.lang]} href={a.href} />)}
-    <link rel="alternate" hreflang="x-default" href={alternates[0].href} />
+    {!Astro.props.noindex && (
+      <>
+        <link rel="canonical" href={canonicalUrl} />
+        {alternates.map((a) => <link rel="alternate" hreflang={htmlLang[a.lang]} href={a.href} />)}
+        <link rel="alternate" hreflang="x-default" href={alternates[0].href} />
+      </>
+    )}
 
     <!-- Open Graph / Social sharing -->
     <meta property="og:title" content={title} />
@@ -105,7 +120,7 @@ const structuredData = {
     <meta property="og:image:height" content="630" />
     <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:alt" content={imageAlt} />
-    <meta property="og:url" content={canonicalUrl} />
+    {!Astro.props.noindex && <meta property="og:url" content={canonicalUrl} />}
     <meta property="og:type" content={type} />
     <meta property="og:site_name" content="Giuliano Espejo Mezzabotta" />
     <meta property="og:locale" content={ogLocale[lang]} />
@@ -121,17 +136,14 @@ const structuredData = {
 
     <meta name="theme-color" content="#0a0b10" />
 
+    <Analytics />
+    <SpeedInsights />
+
     <!-- The `js` class gates the scroll animations so content stays visible without JS -->
     <script is:inline>document.documentElement.classList.add('js');</script>
   </head>
   <body class="min-h-screen antialiased">
-    <!-- Decorative background: drifting blue glows + film grain -->
-    <div class="aurora" aria-hidden="true">
-      <div class="aurora-layer" data-parallax="0.15"><div class="aurora-blob aurora-blob--1"></div></div>
-      <div class="aurora-layer" data-parallax="-0.1"><div class="aurora-blob aurora-blob--2"></div></div>
-      <div class="aurora-layer" data-parallax="0.25"><div class="aurora-blob aurora-blob--3"></div></div>
-    </div>
-    <div class="grain" aria-hidden="true"></div>
+    <a href="#contenido" class="skip-link">{lang === 'en' ? 'Skip to content' : 'Saltar al contenido'}</a>
     <slot />
   </body>
 </html>
@@ -178,13 +190,9 @@ const structuredData = {
   });
 
   // Scroll-linked effects, batched into one rAF per frame:
-  // header progress bar, background parallax and the experience timeline fill
+  // header progress bar and the experience timeline fill
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const progressBar = document.querySelector<HTMLElement>('[data-scroll-progress]');
-  // Skip parallax layers that are hidden (the aurora is display:none on the sky pages)
-  const parallaxLayers = [...document.querySelectorAll<HTMLElement>('[data-parallax]')].filter(
-    (el) => getComputedStyle(el.closest('.aurora') ?? el).display !== 'none',
-  );
   // Dot offsets are measured once (and when the list changes size), not on every scroll frame
   const timelines = [...document.querySelectorAll<HTMLElement>('[data-timeline]')].map((el) => ({
     el,
@@ -207,11 +215,6 @@ const structuredData = {
     (progressBar?.parentElement ?? progressBar)?.style.setProperty('--progress', max > 0 ? (y / max).toFixed(4) : '0');
 
     if (reduceMotion) return;
-
-    parallaxLayers.forEach((layer) => {
-      const speed = Number(layer.dataset.parallax);
-      layer.style.transform = `translate3d(0, ${(y * speed * -1).toFixed(1)}px, 0)`;
-    });
 
     timelines.forEach(({ el, dots, offsets }) => {
       const rect = el.getBoundingClientRect(); // one layout read per timeline

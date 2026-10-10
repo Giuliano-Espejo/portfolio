@@ -198,6 +198,7 @@ export function createFlight(host: HTMLElement, opts: FlightOptions): FlightHand
   routePose(0, pose);
   let lastYaw = pose.yaw;
   let parkedAt = 0; // route stop the plane last rested at (-1 = in transit)
+  let flip = 0; // 0 = facing forward along the route, 1 = turned around (flying back)
   let rollT = -1, rollDir = 1; // barrel roll on take-off
   let parkT = 0, orbitAmt = 0; // slow camera orbit while parked
   let baseFov = 55, fovNow = 55;
@@ -245,6 +246,7 @@ export function createFlight(host: HTMLElement, opts: FlightOptions): FlightHand
 
   // ---- Layout ----
   let vw = 1, vh = 1;
+  let sceneReady = false; // set once the first frame has run (camera placed)
   const resize = () => {
     // The host is display:none until the page confirms WebGL works; a 0×0 size would make the
     // aspect ratio NaN and poison the projection, so wait for a real size
@@ -255,6 +257,8 @@ export function createFlight(host: HTMLElement, opts: FlightOptions): FlightHand
     camera.aspect = vw / vh;
     baseFov = vw < vh ? 68 : 55;
     camera.updateProjectionMatrix();
+    // Resizing clears the canvas; draw again right away so a blank (black) frame is never shown
+    if (sceneReady) renderer.render(scene, camera);
   };
   const ro = new ResizeObserver(resize);
   ro.observe(host);
@@ -354,7 +358,11 @@ export function createFlight(host: HTMLElement, opts: FlightOptions): FlightHand
       const b = blend * blend * (3 - 2 * blend);
       pose.x = rp.x + (from.x - rp.x) * b;
       pose.z = rp.z + (from.z - rp.z) * b;
-      pose.yaw = lerpAngle(rp.yaw, from.yaw, b);
+      // Flying back along the route: turn around (a smooth 180° that banks) instead of reversing;
+      // once stopped or heading forward again it turns back to face the way ahead
+      const backward = uVel < -0.08;
+      flip += ((backward ? 1 : 0) - flip) * (still ? 1 : Math.min(1, dt * 2.2));
+      pose.yaw = lerpAngle(rp.yaw + flip * Math.PI, from.yaw, b);
       speed = Math.min(1, Math.abs(uVel) * 0.8) + blend * 0.4;
     }
     speed = Math.min(speed, 1);
@@ -398,13 +406,17 @@ export function createFlight(host: HTMLElement, opts: FlightOptions): FlightHand
       const n = nearestD < 18 ? nearest : null;
       if (n !== near) { near = n; opts.onNear?.(n); }
     } else {
-      visit(k >= 1 && Math.abs(u - k) < 0.25 ? k - 1 : -1);
+      // Hysteresis: arrive within 0.25 of a stop, but only "leave" once 0.6 away, so small scrolls
+      // around a parked island don't replay the arrival flash
+      if (k >= 1 && Math.abs(u - k) < 0.25) visit(k - 1);
+      else if (current >= 0 && Math.abs(u - (current + 1)) > 0.6) visit(-1);
     }
 
     // Camera: chase from behind, pulled back while moving; drifts around the island while parked
     const parked = !free && !still && k >= 1 && Math.abs(u - k) < 0.2 && Math.abs(uVel) < 0.15;
-    parkT = parked ? parkT + dt : 0;
+    // The orbit fades in and out with orbitAmt; parkT never snaps back to 0 (that made the camera jump)
     orbitAmt += ((parked ? 1 : 0) - orbitAmt) * Math.min(1, dt * 0.8);
+    parkT += dt * orbitAmt;
     const orbit = Math.sin(parkT * 0.22) * 0.4 * orbitAmt;
     const back = 14 + speed * 4, up = 6.5 + speed * 2.5, cyaw = pose.yaw + orbit;
     tmpV.set(Math.sin(cyaw) * back, up, Math.cos(cyaw) * back).add(ship.position);
@@ -475,7 +487,7 @@ export function createFlight(host: HTMLElement, opts: FlightOptions): FlightHand
   };
 
   // ---- Adaptive quality: if frames stay slow, lower the resolution ----
-  let sampleT = 0, sampleN = 0, warmup = 1.5;
+  let sampleT = 0, sampleN = 0, warmup = 1.5, slowWindows = 0;
   const adapt = (dt: number) => {
     if (warmup > 0) { warmup -= dt; return; } // ignore the first frames (shader compiles, layout)
     sampleT += dt;
@@ -483,7 +495,10 @@ export function createFlight(host: HTMLElement, opts: FlightOptions): FlightHand
     if (sampleT < 2) return;
     const slow = sampleT / sampleN > 1 / 45;
     sampleT = sampleN = 0;
-    if (!slow) return;
+    // Two slow 2-second windows in a row: a scroll hiccup alone doesn't lower the quality
+    slowWindows = slow ? slowWindows + 1 : 0;
+    if (slowWindows < 2) return;
+    slowWindows = 0;
     if (dpr > 0.8) {
       dpr = Math.max(0.75, dpr - 0.25);
       renderer.setPixelRatio(dpr);
@@ -510,8 +525,9 @@ export function createFlight(host: HTMLElement, opts: FlightOptions): FlightHand
       const focus = step(dt, t);
       placeLabels();
       if (free) drawMinimap(focus); // the radar is only on screen in free flight
+      adapt(dt); // before rendering: a resolution change is drawn in this same frame
       renderer.render(scene, camera);
-      adapt(dt);
+      sceneReady = true;
     } catch (err) {
       cancelAnimationFrame(raf); // stop instead of throwing every frame
       console.error('[flight] stopped:', err);
