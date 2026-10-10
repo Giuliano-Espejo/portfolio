@@ -1,0 +1,30 @@
+---
+// Daytime sky in pure CSS: a gradient plus ten small cumulus crossing the screen at different
+// heights and speeds (size + opacity + speed give the depth). Each cloud is its own small composited
+// layer, so the drift costs the GPU almost nothing — unlike full-screen animated gradient strips.
+export interface Props {
+  /** Extra class to place the sky (the home uses it as its 2D background / 3D placeholder) */
+  class?: string;
+}
+const { class: extra } = Astro.props;
+
+// top: % of the screen · w: width in vw · dur: seconds to cross · delay: negative, to start spread out
+const clouds = [
+  { top: 10, w: 30, dur: 70, delay: -10, op: 0.6 },
+  { top: 34, w: 26, dur: 80, delay: -50, op: 0.55 },
+  { top: 62, w: 32, dur: 75, delay: -30, op: 0.6 },
+  { top: 20, w: 44, dur: 46, delay: -20, op: 0.8 },
+  { top: 48, w: 40, dur: 52, delay: -8, op: 0.8 },
+  { top: 78, w: 46, dur: 48, delay: -36, op: 0.8 },
+  { top: 4, w: 64, dur: 28, delay: -4, op: 0.95 },
+  { top: 40, w: 70, dur: 32, delay: -20, op: 0.95 },
+  { top: 70, w: 62, dur: 26, delay: -14, op: 0.95 },
+  { top: 88, w: 72, dur: 30, delay: -26, op: 1 },
+];
+---
+
+<div class:list={['sky', extra]} aria-hidden="true">
+  {clouds.map((c) => (
+    <span class="sky-cloud" style={`--top:${c.top}%;--w:${c.w}vw;--dur:${c.dur}s;--delay:${c.delay}s;--op:${c.op}`}></span>
+  ))}
+</div>

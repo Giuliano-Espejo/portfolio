@@ -1,0 +1,433 @@
+---
+// Home flight: the three.js scene is a fixed background for the whole page and scrolling flies GE-01,
+// a propeller plane, from island to island (one per section). This component renders the launch-pad
+// hero, the fixed scene layer, the beacon rail, the radio log and the free-flight panel.
+// Content stays plain HTML in each section.
+import { Image } from 'astro:assets';
+import profileImage from '../assets/profile.webp';
+import SkyClouds from './SkyClouds.astro';
+
+const stops = [
+  { id: 'sobre-mi', label: 'Sobre mí' },
+  { id: 'experiencia', label: 'Experiencia' },
+  { id: 'proyectos', label: 'Proyectos' },
+  { id: 'skills', label: 'Skills' },
+  { id: 'contacto', label: 'Contacto' },
+];
+
+// Radio log: the tower talks to GE-01 as it reaches each island (decorative, the content is in the sections)
+const comms = {
+  launch: 'Torre a GE-01: pista libre. Scrolleá para despegar.',
+  takeoff: 'GE-01 en el aire. Rumbo a baliza 01.',
+  arrive: [
+    'Baliza 01 a la vista: perfil del piloto. Técnico en Programación, profe en la UTN.',
+    'Baliza 02: 6 misiones registradas, 2 en curso.',
+    'Baliza 03: 3 sistemas en producción. Pagos, reservas y stock operativos.',
+    'Baliza 04: escaneando stack… Java, Spring Boot y PostgreSQL confirmados.',
+    'Baliza 05: canal abierto. GE-01 espera tu transmisión.',
+  ],
+  complete: 'Misión cumplida: 5/5 balizas. Gracias por volar con GE-01.',
+  free: 'Control manual confirmado. Buen vuelo, GE-01.',
+};
+---
+
+<!-- 2D sky: the phones' background (no WebGL there) and the desktop's first paint until the 3D is up -->
+<SkyClouds class="m-sky" />
+
+<!-- Fixed scene layer behind the whole page (decorative) -->
+<div class="flight-bg" data-flight-host aria-hidden="true"></div>
+<div class="flight-labels" data-flight-labels aria-hidden="true"></div>
+<div class="flight-vignette" aria-hidden="true"></div>
+
+<section id="nave" class="flight-hero" aria-label="Presentación">
+  <div class="hud-panel max-w-2xl p-6 md:p-8">
+    <p class="hud-label flex items-center gap-2 mb-4">
+      <span class="relative flex h-2 w-2" aria-hidden="true">
+        <span class="absolute inline-flex h-full w-full rounded-full bg-[var(--color-accent)] opacity-75 motion-safe:animate-ping"></span>
+        <span class="relative inline-flex h-2 w-2 rounded-full bg-[var(--color-accent)]"></span>
+      </span>
+      Disponible para proyectos y posiciones backend
+    </p>
+    <div class="flex items-center gap-4 md:gap-6">
+      <div class="photo-ring flex-shrink-0">
+        <Image
+          src={profileImage}
+          alt="Giuliano Espejo Mezzabotta"
+          widths={[96, 144, 288]}
+          sizes="(min-width: 768px) 144px, 96px"
+          loading="eager"
+          fetchpriority="high"
+          class="relative w-24 h-24 md:w-36 md:h-36 rounded-full object-cover border-4 border-[var(--color-bg-primary)]"
+        />
+      </div>
+      <h1 class="font-display text-3xl md:text-5xl font-bold tracking-tight leading-[1.05]">Giuliano Espejo Mezzabotta</h1>
+    </div>
+    <p class="font-mono text-base md:text-lg text-[var(--color-accent)] mt-3">Backend Developer · Java &amp; Spring Boot</p>
+    <p class="text-[var(--color-text-secondary)] leading-relaxed mt-4">
+      Diseño APIs con Spring Boot y PostgreSQL para negocios reales: pagos, reservas y puntos de venta.
+      Profesor de Programación en la UTN.
+    </p>
+    <p class="hud-label mt-4">
+      Indicativo <span class="text-[var(--color-text-primary)]">GE-01</span> · 5 balizas por recuperar
+    </p>
+    <div class="flex flex-wrap gap-2 mt-6">
+      <a href="/Giuliano_Espejo_CV.pdf" download="Giuliano_Espejo_CV.pdf" class="hud-btn hud-btn--primary">Descargar CV</a>
+      <a href="#proyectos" class="hud-btn">Ver proyectos</a>
+      <button type="button" class="hud-btn" data-free-toggle hidden>Vuelo libre</button>
+    </div>
+  </div>
+  <a href="#sobre-mi" class="flight-cue hud-label">
+    Scrolleá para despegar
+    <span class="flight-cue-arrow" aria-hidden="true">↓</span>
+  </a>
+</section>
+
+<!-- Fixed HUD: a slim beacon rail on the right edge, shown once the scene is running -->
+<nav class="flight-rail" data-flight-hud hidden aria-label="Balizas">
+  <ol class="flex flex-col gap-1">
+    {stops.map((s, i) => (
+      <li>
+        <a href={`#${s.id}`} class="rail-item" data-rail={i}>
+          <span class="rail-label">{String(i + 1).padStart(2, '0')} · {s.label}</span>
+          <span class="rail-dot" aria-hidden="true"></span>
+        </a>
+      </li>
+    ))}
+  </ol>
+  <button type="button" class="rail-item" data-free-toggle aria-label="Vuelo libre">
+    <span class="rail-label">Vuelo libre</span>
+    <span class="rail-dot rail-dot--icon" aria-hidden="true">✈</span>
+  </button>
+  <div class="relative">
+    <button type="button" class="rail-item" data-sound-toggle aria-pressed="false" aria-label="Sonido">
+      <span class="rail-label" data-sound-label>Sonido: apagado</span>
+      <span class="rail-dot rail-dot--icon" aria-hidden="true">♪</span>
+    </button>
+    <!-- Brief hint on every load: browsers keep audio off until the visitor turns it on -->
+    <p class="sound-hint" data-sound-hint hidden role="status">
+      <span class="font-semibold">El sonido está apagado.</span> Activalo acá para escuchar el motor y la radio.
+    </p>
+  </div>
+</nav>
+
+<!-- Radio log (decorative: everything it says is in the sections) -->
+<div class="flight-comms" data-comms hidden aria-hidden="true">
+  <p class="hud-label flex items-center gap-2 mb-1">
+    <span class="comms-dot"></span>Torre → GE-01
+  </p>
+  <p class="font-mono text-xs md:text-sm leading-relaxed" data-comms-text></p>
+</div>
+
+<!-- Free-flight controls -->
+<div class="flight-free" data-free-panel hidden role="dialog" aria-label="Vuelo libre">
+  <div class="hud-panel p-4 flex flex-wrap items-center gap-4 justify-center">
+    <div class="grid grid-cols-3 gap-1 font-mono text-xs" aria-hidden="true">
+      <span></span><kbd class="key">W</kbd><span></span>
+      <kbd class="key">A</kbd><kbd class="key">S</kbd><kbd class="key">D</kbd>
+    </div>
+    <p class="text-sm text-[var(--color-text-secondary)] max-w-56">Volá con WASD o las flechas, o mantené apretado y arrastrá. Acercate a una isla.</p>
+    <canvas class="hidden md:block w-24 h-24" width="96" height="96" data-minimap aria-hidden="true"></canvas>
+    <div class="flex flex-col gap-2">
+      <a href="#" class="hud-btn hud-btn--primary" data-near-link hidden></a>
+      <button type="button" class="hud-btn" data-free-exit>Volver al portfolio (Esc)</button>
+    </div>
+  </div>
+</div>
+
+<script define:vars={{ stops, comms }}>
+  window.__flight = { stops, comms };
+</script>
+
+<script>
+  import type { FlightHandle } from '../scripts/flight';
+  import type { FlightSound } from '../scripts/flight-sound';
+
+  interface Stop { id: string; label: string }
+  interface Comms { launch: string; takeoff: string; arrive: string[]; complete: string; free: string }
+  const { stops, comms } = (window as unknown as { __flight: { stops: Stop[]; comms: Comms } }).__flight;
+  const host = document.querySelector<HTMLElement>('[data-flight-host]');
+  const hud = document.querySelector<HTMLElement>('[data-flight-hud]');
+  const freePanel = document.querySelector<HTMLElement>('[data-free-panel]');
+  const nearLink = document.querySelector<HTMLAnchorElement>('[data-near-link]');
+  const rail = [...document.querySelectorAll<HTMLAnchorElement>('[data-rail]')];
+  const freeToggles = [...document.querySelectorAll<HTMLButtonElement>('[data-free-toggle]')];
+  const soundToggle = document.querySelector<HTMLButtonElement>('[data-sound-toggle]');
+  const soundLabel = document.querySelector<HTMLElement>('[data-sound-label]');
+  const commsBox = document.querySelector<HTMLElement>('[data-comms]');
+  const commsText = document.querySelector<HTMLElement>('[data-comms-text]');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const mobile = window.matchMedia('(max-width: 767px)').matches;
+  const visited = new Set<number>();
+  let flight: FlightHandle | null = null;
+  let sound: FlightSound | null = null;
+
+  // Route stops: the hero (launch pad) and one section per island
+  const sections = [document.getElementById('nave'), ...stops.map((s) => document.getElementById(s.id))];
+  // Which side each stop's panel sits on (-1 left, 1 right), mirrored in the CSS layout
+  const panelSides = sections.map((el) => (el?.dataset.side === 'right' ? 1 : -1));
+  // Everything the plane must not hide behind: the hero card and every section panel
+  const panels = [
+    document.querySelector<HTMLElement>('#nave .hud-panel'),
+    ...document.querySelectorAll<HTMLElement>('main[data-flight] > section:not(.flight-hero)'),
+  ].filter((p): p is HTMLElement => !!p);
+
+  // Pick the screen spot for the plane farthest from every visible panel (a coarse grid is plenty).
+  // Candidates stay in a safe central band so the plane and the island ahead never leave the screen;
+  // the score prefers the last spot and the lower middle, so the plane glides instead of jumping.
+  let focus = { x: 0.5, y: 0.7 };
+  const findFocus = () => {
+    const vw = window.innerWidth, vh = window.innerHeight, top = 64; // below the sticky header
+    const rects = panels.map((p) => p.getBoundingClientRect()).filter((r) => r.bottom > top && r.top < vh);
+    let best = focus, bestScore = -Infinity;
+    for (let i = 0; i <= 8; i++) {
+      for (let j = 0; j <= 6; j++) {
+        const x = vw * (0.22 + (0.56 * i) / 8), y = vh * (0.4 + (0.38 * j) / 6);
+        let clear = Math.min(vw, vh); // distance to the nearest panel (negative when inside one)
+        for (const r of rects) {
+          const dx = Math.max(r.left - x, 0, x - r.right), dy = Math.max(r.top - y, 0, y - r.bottom);
+          const d = dx || dy ? Math.hypot(dx, dy) : -Math.min(x - r.left, r.right - x, y - r.top, r.bottom - y);
+          clear = Math.min(clear, d);
+        }
+        const nx = x / vw, ny = y / vh;
+        const score = Math.min(clear, 200) - Math.hypot(nx - focus.x, ny - focus.y) * 90 - Math.abs(ny - 0.7) * 60 - Math.abs(nx - 0.5) * 30;
+        if (score > bestScore) { bestScore = score; best = { x: nx, y: ny }; }
+      }
+    }
+    focus = best;
+    flight?.setFocus(focus.x, focus.y);
+  };
+
+  // Scroll → route position. A stop is "reached" when its section top passes 35% of the viewport;
+  // the plane holds at an island while you read and travels during the gap before the next section.
+  let anchors: number[] = [];
+  const measure = () => {
+    const vh = window.innerHeight;
+    const max = document.documentElement.scrollHeight - vh;
+    anchors = sections.map((el, k) => (k === 0 || !el ? 0 : Math.min(el.getBoundingClientRect().top + window.scrollY - vh * 0.35, max)));
+  };
+  const progress = () => {
+    const y = window.scrollY;
+    for (let k = 0; k < anchors.length - 1; k++) {
+      if (y < anchors[k + 1]) {
+        const f = Math.min(Math.max((y - anchors[k]) / Math.max(anchors[k + 1] - anchors[k], 1), 0), 1);
+        const e = Math.min(Math.max((f - 0.4) / 0.6, 0), 1);
+        return k + e * e * (3 - 2 * e);
+      }
+    }
+    return anchors.length - 1;
+  };
+
+  let stop = 0;
+  const updateStop = (u: number) => {
+    stop = Math.round(u);
+    rail.forEach((r, i) => (i === stop - 1 ? r.setAttribute('aria-current', 'true') : r.removeAttribute('aria-current')));
+    // The radio sits on the side of the scene, away from the current panel
+    if (commsBox) commsBox.dataset.side = panelSides[stop] === 1 ? 'left' : 'right';
+  };
+
+  let ticking = false;
+  const onScroll = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      ticking = false;
+      const u = progress();
+      flight?.setProgress(u);
+      updateStop(u);
+      findFocus();
+    });
+  };
+
+  // ---- Radio log: queued messages, typed out, auto-hidden ----
+  const queue: string[] = [];
+  let busy = false, hideTimer = 0;
+  const say = (msg: string) => {
+    queue.push(msg);
+    if (!busy) next();
+  };
+  const next = () => {
+    const msg = queue.shift();
+    if (!msg || !commsBox || !commsText) { busy = false; return; }
+    busy = true;
+    clearTimeout(hideTimer);
+    commsBox.hidden = false;
+    commsBox.classList.remove('is-out');
+    sound?.blip();
+    let i = 0;
+    const type = () => {
+      i = reduceMotion ? msg.length : i + 1;
+      commsText.textContent = msg.slice(0, i);
+      if (i < msg.length) setTimeout(type, 24);
+      else {
+        // Hold, then either the next message or fade out
+        setTimeout(() => {
+          if (queue.length) next();
+          else {
+            busy = false;
+            hideTimer = window.setTimeout(() => commsBox.classList.add('is-out'), 2600);
+          }
+        }, 1800);
+      }
+    };
+    type();
+  };
+
+  const setFreeUI = (on: boolean) => {
+    document.documentElement.classList.toggle('free-flight', on);
+    if (freePanel) freePanel.hidden = !on;
+    if (on) {
+      freePanel?.querySelector<HTMLElement>('[data-free-exit]')?.focus();
+      say(comms.free);
+    } else freeToggles[0]?.focus({ preventScroll: true });
+  };
+
+  const boot = async () => {
+    if (!host) return;
+    const [{ createFlight }, { createSound }] = await Promise.all([import('../scripts/flight'), import('../scripts/flight-sound')]);
+    sound = createSound();
+    flight = createFlight(host, {
+      labels: stops.map((s) => s.label),
+      reduceMotion,
+      minimap: document.querySelector<HTMLCanvasElement>('[data-minimap]'),
+      labelHost: document.querySelector<HTMLElement>('[data-flight-labels]'),
+      onVisit: (i, first) => {
+        sound?.chime();
+        rail[i]?.classList.add('is-on');
+        // The panel "locks on": corner brackets draw in (Skills shares its island with Educación)
+        sections[i + 1]?.classList.add('is-arrived');
+        if (stops[i].id === 'skills') document.getElementById('educacion')?.classList.add('is-arrived');
+        if (!first) return;
+        visited.add(i);
+        say(comms.arrive[i]);
+        if (visited.size === stops.length) say(comms.complete);
+      },
+      onDepart: (from) => {
+        sound?.whoosh();
+        if (from === 0 && !visited.size) say(comms.takeoff);
+      },
+      onNear: (i) => {
+        if (!nearLink) return;
+        nearLink.hidden = i === null;
+        if (i !== null) {
+          nearLink.href = `#${stops[i].id}`;
+          nearLink.textContent = `Ir a ${stops[i].label} →`;
+        }
+      },
+      onFreeChange: setFreeUI,
+      onSpeed: (s) => sound?.setSpeed(s),
+    });
+    if (!flight) return; // no WebGL: the page keeps its static background
+    document.documentElement.classList.add('has-flight');
+    if (hud) hud.hidden = false;
+    freeToggles.forEach((b) => {
+      b.hidden = false;
+      b.addEventListener('click', () => flight?.setFree(true));
+    });
+    freePanel?.querySelector('[data-free-exit]')?.addEventListener('click', () => flight?.setFree(false));
+    nearLink?.addEventListener('click', () => flight?.setFree(false)); // then the anchor scrolls to the section
+    // Sound hint: shows a few seconds after the scene is up (every load), then fades out by itself
+    const hint = document.querySelector<HTMLElement>('[data-sound-hint]');
+    const hideHint = () => {
+      if (!hint || hint.hidden) return;
+      hint.classList.remove('is-shown');
+      setTimeout(() => { hint.hidden = true; }, 400);
+    };
+    if (hint) {
+      setTimeout(() => {
+        if (soundToggle?.getAttribute('aria-pressed') === 'true') return;
+        hint.hidden = false;
+        requestAnimationFrame(() => hint.classList.add('is-shown'));
+        setTimeout(hideHint, 6000);
+      }, 2500);
+    }
+
+    soundToggle?.addEventListener('click', () => {
+      hideHint();
+      const on = soundToggle.getAttribute('aria-pressed') !== 'true';
+      soundToggle.setAttribute('aria-pressed', String(on));
+      soundToggle.classList.toggle('is-on', on);
+      if (soundLabel) soundLabel.textContent = on ? 'Sonido: encendido' : 'Sonido: apagado';
+      sound?.setEnabled(on);
+    });
+
+    measure();
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', () => { measure(); onScroll(); }, { passive: true });
+    // Section heights change as fonts and images load
+    new ResizeObserver(() => { measure(); onScroll(); }).observe(document.body);
+    if (window.scrollY < 50) setTimeout(() => say(comms.launch), 900);
+  };
+
+  // ---- Phones: a little plane tows each section card in (banner-tow style) ----
+  // Cards below the fold wait off-screen to the right; when the spot where a card starts scrolls into
+  // view, the plane flies in from the right pulling it on a rope, drops it in place and flies off.
+  // Runs without WebGL too; skipped with reduced motion (cards are then simply there).
+  const TOW_PLANE = `<svg class="tow-plane" viewBox="0 0 64 32" aria-hidden="true">
+      <ellipse cx="4" cy="15" rx="1.6" ry="11" fill="#5b6b82" opacity="0.55"/>
+      <path d="M5 13 Q6 9 14 9 L50 11 L60 5 L62 6 L58 14 L60 16 L50 17 L14 19 Q6 19 5 15 Z" fill="#e2532d" stroke="#1c2b45" stroke-width="1.2" stroke-linejoin="round"/>
+      <rect x="16" y="5" width="20" height="3" rx="1.5" fill="#c8431f" stroke="#1c2b45" stroke-width="1"/>
+      <rect x="15" y="20" width="22" height="3" rx="1.5" fill="#c8431f" stroke="#1c2b45" stroke-width="1"/>
+      <path d="M20 8 L20 20 M31 8 L31 20" stroke="#1c2b45" stroke-width="0.9"/>
+      <path d="M18 12 Q22 10 26 12 L26 14 L18 14 Z" fill="#7cc4ff" stroke="#1c2b45" stroke-width="0.8"/>
+      <circle cx="22" cy="26" r="2.6" fill="#1c2b45"/>
+    </svg>
+    <svg class="tow-rope" viewBox="0 0 52 50" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0 0 Q 30 36 52 50" fill="none" stroke="#1c2b45" stroke-width="1.4" stroke-dasharray="3 3"/>
+    </svg>`;
+  // A card landed: lock-on brackets + the radio line for its island (first visit only)
+  const arrived = (card: HTMLElement) => {
+    card.classList.add('is-arrived');
+    const i = stops.findIndex((s) => s.id === card.id);
+    if (i < 0 || visited.has(i)) return;
+    visited.add(i);
+    say(comms.arrive[i]);
+    if (visited.size === stops.length) say(comms.complete);
+  };
+
+  const setupTow = () => {
+    if (!mobile || reduceMotion || !('IntersectionObserver' in window)) return;
+    const cards = [...document.querySelectorAll<HTMLElement>('main[data-flight] > section:not(.flight-hero)')];
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        io.unobserve(e.target);
+        const card = (e.target as HTMLElement).nextElementSibling as HTMLElement | null;
+        if (!card) return;
+        card.classList.remove('tow-pending');
+        card.classList.add('is-towing');
+        card.addEventListener('animationend', (ev) => {
+          if (ev.target !== card) return;
+          card.classList.remove('is-towing');
+          card.querySelector('.tow')?.remove();
+          arrived(card);
+        }, { once: true });
+      });
+    }, { rootMargin: '0px 0px -8% 0px' });
+    cards.forEach((card) => {
+      if (card.getBoundingClientRect().top < window.innerHeight) return; // already on screen
+      // The card itself is moved off-screen, so watch a marker that stays where the card begins
+      const marker = document.createElement('div');
+      marker.className = 'tow-marker';
+      marker.setAttribute('aria-hidden', 'true');
+      card.before(marker);
+      const tow = document.createElement('div');
+      tow.className = 'tow';
+      tow.setAttribute('aria-hidden', 'true');
+      tow.innerHTML = TOW_PLANE;
+      card.prepend(tow);
+      card.classList.add('tow-pending');
+      io.observe(marker);
+    });
+  };
+  setupTow();
+
+  if (mobile) {
+    // No WebGL on phones: CSS sky + towed cards; the radio still opens with the tower's call
+    if (window.scrollY < 50) setTimeout(() => say(comms.launch), 900);
+  } else {
+    // Let the page paint first; three.js loads right after
+    if ('requestIdleCallback' in window) requestIdleCallback(() => boot(), { timeout: 1500 });
+    else setTimeout(boot, 400);
+  }
+</script>

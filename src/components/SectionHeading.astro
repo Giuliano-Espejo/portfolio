@@ -2,15 +2,18 @@
 export interface Props {
   index: string;
   title: string;
+  /** HUD tag shown above the title, e.g. "Baliza 02 // Trayectoria" */
+  tag?: string;
 }
 
-const { index, title } = Astro.props;
+const { index, title, tag } = Astro.props;
 
 // Split into words → chars so letters can animate one by one without breaking words across lines
 let charIndex = 0;
 const words = title.split(' ').map(word => [...word].map(char => ({ char, i: charIndex++ })));
 ---
 
+{tag && <p class="hud-label text-[var(--color-accent)] mb-3" aria-hidden="true">[{tag}]</p>}
 <div class="reveal-heading flex items-center gap-4 mb-10">
   <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-[var(--color-text-primary)]" aria-label={title}>
     <span class="font-mono text-base md:text-lg font-medium text-gradient mr-3 align-middle" aria-hidden="true">{index}.</span>

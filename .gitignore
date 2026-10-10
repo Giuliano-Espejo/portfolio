@@ -28,3 +28,6 @@ PORTFOLIO_*.md
 
 # local SEO reports
 *.mhtml
+
+# design references (not part of the site)
+Ideas/

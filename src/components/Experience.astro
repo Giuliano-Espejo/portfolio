@@ -90,9 +90,9 @@ const experiences = [
 ];
 ---
 
-<section id="experiencia" class="max-w-4xl mx-auto px-4 py-12">
-  <SectionHeading index="02" title="Experiencia" />
-  <ol class="timeline ml-2 space-y-8" data-timeline>
+<section id="experiencia" data-side="right" class="max-w-4xl mx-auto px-4 py-12">
+  <SectionHeading index="02" title="Experiencia" tag="Baliza 02 // Trayectoria" />
+  <ol class="timeline ml-2 space-y-8" data-timeline data-exp-list id="exp-list">
     {experiences.map(exp => (
       <li class="relative pl-8 md:pl-10">
         <span class="timeline-dot" aria-hidden="true"></span>
@@ -130,4 +130,18 @@ const experiences = [
       </li>
     ))}
   </ol>
+  <!-- Phones: only the first two roles show until this is pressed (the full list without JS) -->
+  <button type="button" class="exp-more hud-btn mt-6" data-exp-more aria-expanded="false" aria-controls="exp-list">
+    Ver las {experiences.length} misiones
+  </button>
 </section>
+
+<script>
+  const list = document.querySelector<HTMLElement>('[data-exp-list]');
+  const more = document.querySelector<HTMLButtonElement>('[data-exp-more]');
+  more?.addEventListener('click', () => {
+    const open = list?.classList.toggle('is-open') ?? false;
+    more.setAttribute('aria-expanded', String(open));
+    more.hidden = open;
+  });
+</script>

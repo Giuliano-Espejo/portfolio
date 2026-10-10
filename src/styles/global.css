@@ -1,63 +1,40 @@
 @import "tailwindcss";
 
-/* Tailwind v4 defaults `dark:` to prefers-color-scheme; follow the .dark class set by ThemeToggle instead */
+/* The site is dark-only (html.dark); keep the variant so existing `dark:` utilities still resolve */
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --font-sans: 'Inter Variable', sans-serif;
-  --font-display: 'Space Grotesk Variable', 'Inter Variable', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-sans: 'Hanken Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Space Grotesk Variable', 'Hanken Grotesk Variable', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 }
 
-/* ============ Tokens ============ */
-/* Neutral zinc grays + a blue spectrum (indigo → blue → cyan) */
+/* ============ Tokens: "Obsidian Kinetic" (from Ideas/stitch_three.js_portfolio_concepts) ============ */
+/* Dark-only: obsidian canvas, neon cyan for focus/action, electric violet for atmosphere */
 
-/* Light mode (default) */
-:root {
-  color-scheme: light;
-  --color-bg-primary: #f4f4f5;
-  --color-bg-secondary: #e4e4e7;
-  --color-text-primary: #18181b;
-  --color-text-secondary: #52525b;
-  --color-accent: #2563eb;
-  --color-accent-hover: #1d4ed8;
-  --color-on-accent: #ffffff;
-  --color-highlight: #0e7490;
-  --color-highlight-soft: rgba(8, 145, 178, 0.1);
-  --color-success: #15803d;
-  --color-success-soft: rgba(21, 128, 61, 0.1);
-  --color-border: rgba(24, 24, 27, 0.12);
-  --color-card-bg: rgba(255, 255, 255, 0.7);
-  --color-card-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px -12px rgba(37, 99, 235, 0.15);
-  --g1: #4f46e5;
-  --g2: #2563eb;
-  --g3: #0891b2;
-  --blob-opacity: 0.35;
-  --grain-opacity: 0.035;
-}
-
-/* Dark mode */
+:root,
 html.dark {
   color-scheme: dark;
-  --color-bg-primary: #09090b;
-  --color-bg-secondary: #18181b;
-  --color-text-primary: #fafafa;
-  --color-text-secondary: #a1a1aa;
-  --color-accent: #60a5fa;
-  --color-accent-hover: #93c5fd;
-  --color-on-accent: #ffffff;
-  --color-highlight: #22d3ee;
-  --color-highlight-soft: rgba(34, 211, 238, 0.12);
+  --color-bg-primary: #0a0b10;
+  --color-bg-secondary: #12131c;
+  --color-text-primary: #f1f5f9;
+  --color-text-secondary: #94a3b8;
+  --color-accent: #00f0ff;
+  --color-accent-hover: #7df4ff;
+  --color-on-accent: #0a0b10;
+  --color-highlight: #38bdf8;
+  --color-highlight-soft: rgba(56, 189, 248, 0.12);
+  --color-violet: #7928ca;
   --color-success: #4ade80;
   --color-success-soft: rgba(74, 222, 128, 0.12);
   --color-border: rgba(255, 255, 255, 0.08);
-  --color-card-bg: rgba(24, 24, 27, 0.55);
-  --color-card-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 32px -16px rgba(59, 130, 246, 0.25);
-  --g1: #6366f1;
-  --g2: #3b82f6;
-  --g3: #22d3ee;
-  --blob-opacity: 0.5;
-  --grain-opacity: 0.05;
+  --color-card-bg: rgba(18, 19, 28, 0.65);
+  --color-card-shadow: 0 0 40px -8px rgba(121, 40, 202, 0.2);
+  --g1: #7928ca;
+  --g2: #38bdf8;
+  --g3: #00f0ff;
+  --blob-opacity: 0.18;
+  --grain-opacity: 0.02;
 }
 
 html {
@@ -69,7 +46,6 @@ body {
   background-color: var(--color-bg-primary);
   color: var(--color-text-primary);
   font-family: var(--font-sans);
-  transition: background-color 0.3s, color 0.3s;
 }
 
 h1, h2, h3 {
@@ -125,16 +101,16 @@ h1, h2, h3 {
   color: transparent;
 }
 
-/* Fixed darker stops in both themes: white on #3b82f6 is only 3.7:1 */
+/* Primary action: solid neon cyan with obsidian text (Obsidian Kinetic) */
 .btn-gradient {
-  background: linear-gradient(135deg, #4f46e5, #2563eb);
+  background: var(--color-accent);
   color: var(--color-on-accent);
-  box-shadow: 0 8px 24px -8px var(--g2);
+  box-shadow: 0 0 24px -4px rgba(0, 240, 255, 0.25);
   transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 
 .btn-gradient:hover {
-  box-shadow: 0 12px 32px -8px var(--g2);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
   transform: translateY(-2px);
 }
 
@@ -206,6 +182,20 @@ h1, h2, h3 {
   background: linear-gradient(90deg, var(--g1), var(--g2), var(--g3));
   transform-origin: left;
   transform: scaleX(var(--progress, 0));
+}
+
+/* A little plane flying at the tip of the progress bar (nose to the right) */
+.scroll-plane {
+  position: absolute;
+  bottom: -11px;
+  left: 0;
+  width: 22px;
+  height: 22px;
+  /* transform (not left) so scrolling never triggers layout */
+  transform: translateX(calc(var(--progress, 0) * (100vw - 22px)));
+  pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cg transform='rotate(90 16 16)' stroke='%231c2b45' stroke-width='1.3' stroke-linejoin='round'%3E%3Cpath d='M16 2C17.4 2 18 3.6 18 5L18 13L29 16L29 18.5L18 17.5L17.6 25L21 27L21 29L16 28L11 29L11 27L14.4 25L14 17.5L3 18.5L3 16L14 13L14 5C14 3.6 14.6 2 16 2Z' fill='%23e2532d'/%3E%3Cpath d='M16 4.2V12' stroke='%23fffaf2' stroke-width='1.1' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
 }
 
 /* ============ Hero ============ */
@@ -352,6 +342,11 @@ h1, h2, h3 {
 
 @keyframes blink {
   50% { opacity: 0; }
+}
+
+@keyframes cue-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
 }
 
 @keyframes scroll-cue {
@@ -683,3 +678,653 @@ header:has(.site-nav:popover-open) .site-nav-toggle .icon-open {
 header:has(.site-nav:popover-open) .site-nav-toggle .icon-close {
   display: block;
 }
+
+/* ============ Home flight: fixed 3D scene behind the page, sections as HUD panels ============ */
+.flight-bg,
+.flight-labels,
+.flight-vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+.flight-bg { pointer-events: none; }
+.flight-bg canvas { display: block; width: 100%; height: 100%; }
+.flight-labels { pointer-events: none; overflow: hidden; }
+.flight-vignette {
+  pointer-events: none;
+  /* Daytime sky: only a soft edge so the dark panels and the header still sit well */
+  background:
+    radial-gradient(circle at center, transparent 62%, rgba(10, 11, 16, 0.32) 100%),
+    linear-gradient(to bottom, rgba(10, 11, 16, 0.35), transparent 14%);
+}
+html.has-flight footer { background: rgba(10, 11, 16, 0.9); }
+/* Without WebGL the layers stay empty and the aurora background shows instead */
+html:not(.has-flight) .flight-bg,
+html:not(.has-flight) .flight-labels,
+html:not(.has-flight) .flight-vignette { display: none; }
+html.has-flight .aurora,
+html.has-flight .grain { display: none; }
+
+main[data-flight],
+html.has-flight footer { position: relative; z-index: 1; }
+
+.flight-hero {
+  position: relative;
+  min-height: calc(100svh - 4rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 3rem 1rem 6rem;
+}
+@media (min-width: 1024px) { .flight-hero { padding-left: max(2rem, 6vw); } }
+.flight-cue {
+  position: absolute;
+  left: 50%;
+  bottom: 1.5rem;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+.flight-cue:hover { color: var(--color-text-primary); }
+@media (prefers-reduced-motion: no-preference) {
+  .flight-cue-arrow { animation: cue-bob 1.8s ease-in-out infinite; }
+}
+
+/* Sections become glass panels that alternate sides, leaving room for the ship and the beacon */
+main[data-flight] > section:not(.flight-hero) {
+  width: min(100% - 2rem, 44rem);
+  max-width: none;
+  margin: 12vh auto 45vh;
+  padding: 2rem 1.25rem;
+  background: rgba(14, 15, 22, 0.86);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.5rem;
+}
+main[data-flight] > #proyectos { width: min(100% - 2rem, 50rem); }
+main[data-flight] > #proyectos .grid { grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); }
+main[data-flight] > #skills { margin-bottom: 2rem; } /* Educación shares the Skills beacon */
+main[data-flight] > #contacto { margin-bottom: 30vh; }
+@media (min-width: 1024px) {
+  main[data-flight] > section:not(.flight-hero) { padding: 2.5rem; margin-left: max(2rem, 6vw); margin-right: auto; }
+  main[data-flight] > section[data-side='right'] { margin-left: auto; margin-right: max(4rem, 6vw); } /* clear the rail */
+}
+/* Phones: no backdrop blur over the moving scene (it is recomputed every frame); solid glass instead */
+@media (max-width: 767px) {
+  main[data-flight] > section:not(.flight-hero),
+  html.has-flight .hud-panel { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(14, 15, 22, 0.92); }
+}
+main[data-flight] .card { background-color: rgba(255, 255, 255, 0.025); backdrop-filter: none; -webkit-backdrop-filter: none; }
+
+/* Fixed HUD: beacon rail on the right edge (labels show on hover/focus so they never cover a panel) */
+.flight-rail {
+  position: fixed;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+.flight-rail[hidden] { display: none; }
+.rail-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.25rem;
+  cursor: pointer;
+}
+.rail-dot {
+  display: grid;
+  place-items: center;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(10, 11, 16, 0.6);
+  transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+.rail-dot--icon { width: 1.75rem; height: 1.75rem; font-size: 0.8rem; color: var(--color-accent); border-color: rgba(0, 240, 255, 0.4); }
+.rail-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.25rem;
+  background: rgba(10, 11, 16, 0.85);
+  color: var(--color-text-secondary);
+  opacity: 0;
+  transform: translateX(4px);
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
+}
+.rail-item:hover .rail-label,
+.rail-item:focus-visible .rail-label { opacity: 1; transform: none; }
+.rail-item.is-on .rail-dot { background: var(--color-accent); border-color: var(--color-accent); }
+.rail-item.is-on .rail-dot--icon { color: var(--color-on-accent); }
+.rail-item[aria-current='true'] .rail-dot { transform: scale(1.35); box-shadow: 0 0 12px rgba(0, 240, 255, 0.7); }
+.rail-item[aria-current='true'] .rail-label { color: var(--color-text-primary); }
+.rail-item:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; border-radius: 0.25rem; }
+/* Phones: the rail would cover text, keep only the dots */
+@media (max-width: 767px) {
+  .flight-rail { right: 0.25rem; }
+  .rail-label { display: none; }
+}
+
+/* Free flight: content steps aside, the scene takes input */
+html.free-flight { overflow: hidden; }
+/* Hide the sections, not <main>: the scene layers and the free-flight panel live inside it */
+main[data-flight] > section,
+html.has-flight footer,
+.flight-rail { transition: opacity 0.4s ease, visibility 0.4s; }
+html.free-flight main[data-flight] > section,
+html.free-flight footer,
+html.free-flight .flight-rail { opacity: 0; visibility: hidden; }
+html.free-flight .flight-bg { z-index: 2; }
+/* Gunsight cursor while flying */
+html.free-flight .flight-bg canvas {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%2300f0ff' stroke-width='1.5'/%3E%3Cpath d='M16 2v8M16 22v8M2 16h8M22 16h8' stroke='%2300f0ff' stroke-width='1.5'/%3E%3Ccircle cx='16' cy='16' r='1.5' fill='%2300f0ff'/%3E%3C/svg%3E") 16 16, crosshair;
+}
+html.free-flight .flight-labels { z-index: 3; }
+.flight-free {
+  position: fixed;
+  left: 1rem;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 45;
+  display: flex;
+  justify-content: center;
+}
+.flight-free[hidden] { display: none; }
+
+.hud-panel {
+  background: rgba(18, 19, 28, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.5rem;
+}
+.hud-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 14px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+.hud-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.875rem;
+  border-radius: 0.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
+}
+.hud-btn:hover { border-color: var(--color-accent); background: rgba(0, 240, 255, 0.05); }
+.hud-btn--primary { background: var(--color-accent); border-color: var(--color-accent); color: var(--color-on-accent); font-weight: 700; }
+.hud-btn--primary:hover { background: var(--color-accent); box-shadow: 0 0 20px rgba(0, 240, 255, 0.4); }
+.hud-btn:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.hud-chip {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  background: rgba(0, 240, 255, 0.06);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  color: var(--color-highlight);
+}
+.key {
+  display: grid;
+  place-items: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 0.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(10, 11, 16, 0.6);
+}
+.beacon-label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 0.2rem 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  background: rgba(10, 11, 16, 0.7);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--color-text-primary);
+  transition: opacity 0.3s;
+  will-change: transform;
+}
+.beacon-label.is-visited { border-color: rgba(74, 222, 128, 0.6); color: #bbf7d0; }
+
+/* ============ Flight character: radio log + panel lock-on ============ */
+.flight-comms {
+  position: fixed;
+  top: 5rem; /* under the header, away from the plane (which sits low in the free area) */
+  z-index: 41;
+  width: min(22rem, calc(100% - 5rem));
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  background: rgba(10, 11, 16, 0.85);
+  color: var(--color-text-primary);
+  box-shadow: 0 0 24px -8px rgba(0, 240, 255, 0.35);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  pointer-events: none;
+}
+.flight-comms[hidden] { display: none; }
+.flight-comms.is-out { opacity: 0; transform: translateY(8px); }
+.flight-comms[data-side='right'] { right: 4rem; } /* clear the rail */
+.flight-comms[data-side='left'] { left: 1.25rem; }
+.comms-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: #4ade80;
+  box-shadow: 0 0 8px #4ade80;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .comms-dot { animation: blink 1s steps(2, start) infinite; }
+}
+@media (max-width: 767px) {
+  /* Phones: a compact strip under the header */
+  .flight-comms,
+  .flight-comms[data-side] { top: 4.5rem; bottom: auto; left: 0.75rem; right: 0.75rem; width: auto; padding: 0.5rem 0.75rem; }
+}
+
+/* Panels "lock on" when the plane reaches their island: corner brackets draw in, a cyan pulse */
+main[data-flight] > section:not(.flight-hero) { position: relative; }
+main[data-flight] > section:not(.flight-hero)::before,
+main[data-flight] > section:not(.flight-hero)::after {
+  content: '';
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  border: 2px solid var(--color-accent);
+  opacity: 0;
+  pointer-events: none;
+}
+main[data-flight] > section:not(.flight-hero)::before { top: -2px; left: -2px; border-right: 0; border-bottom: 0; border-top-left-radius: 0.5rem; }
+main[data-flight] > section:not(.flight-hero)::after { bottom: -2px; right: -2px; border-left: 0; border-top: 0; border-bottom-right-radius: 0.5rem; }
+main[data-flight] > section.is-arrived::before,
+main[data-flight] > section.is-arrived::after { opacity: 1; }
+@media (prefers-reduced-motion: no-preference) {
+  main[data-flight] > section.is-arrived::before,
+  main[data-flight] > section.is-arrived::after { animation: bracket-in 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+  main[data-flight] > section.is-arrived { animation: lock-on 1.4s ease-out; }
+}
+@keyframes bracket-in {
+  from { opacity: 0; width: 0; height: 0; }
+  40% { opacity: 1; }
+  to { opacity: 1; width: 26px; height: 26px; }
+}
+@keyframes lock-on {
+  0% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0); border-color: rgba(255, 255, 255, 0.08); }
+  25% { box-shadow: 0 0 48px -6px rgba(0, 240, 255, 0.45); border-color: rgba(0, 240, 255, 0.5); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0); border-color: rgba(255, 255, 255, 0.08); }
+}
+
+/* ============ "Cabina vintage" palette for the home cards ============ */
+/* Flight-manual paper over the daytime sky: cream cards, navy ink, the biplane's orange, sky blue */
+main[data-flight] > section:not(.flight-hero),
+.flight-hero .hud-panel,
+.flight-free .hud-panel,
+.flight-comms {
+  --color-text-primary: #1c2b45;
+  --color-text-secondary: #5b6b82;
+  --color-accent: #e2532d;
+  --color-accent-hover: #c8431f;
+  --color-on-accent: #fffaf2;
+  --color-highlight: #2f7bc0;
+  --color-highlight-soft: rgba(47, 123, 192, 0.12);
+  --color-success: #2e8b57;
+  --color-success-soft: rgba(46, 139, 87, 0.12);
+  --color-border: #e0d5c1;
+  --color-bg-primary: #f6f1e6; /* timeline dots and other "cut-outs" take the paper colour */
+  --color-bg-secondary: #ede4d3;
+  --color-card-bg: #fffdf8;
+  --color-card-shadow: 0 6px 18px -10px rgba(28, 43, 69, 0.35);
+  --g1: #e2532d;
+  --g2: #f0894a;
+  --g3: #2f7bc0;
+  color: var(--color-text-primary);
+  background: #f6f1e6;
+  border: 1px solid #e0d5c1;
+  box-shadow: 0 18px 40px -18px rgba(28, 43, 69, 0.45);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+@media (max-width: 767px) {
+  main[data-flight] > section:not(.flight-hero),
+  html.has-flight .flight-hero .hud-panel,
+  html.has-flight .flight-free .hud-panel { background: #f6f1e6; }
+}
+/* Boarding-pass stripe across the top of each section card */
+main[data-flight] > section:not(.flight-hero) {
+  background-image: linear-gradient(90deg, #1c2b45 0 70%, #e2532d 70% 85%, #2f7bc0 85%);
+  background-size: 100% 5px;
+  background-repeat: no-repeat;
+}
+main[data-flight] .card {
+  background-color: var(--color-card-bg);
+  border-color: var(--color-border);
+  box-shadow: var(--color-card-shadow);
+}
+/* HUD bits inside the paper cards */
+main[data-flight] .hud-label,
+.flight-hero .hud-label,
+.flight-free .hud-label,
+.flight-comms .hud-label { color: var(--color-text-secondary); }
+.flight-hero .hud-btn,
+.flight-free .hud-btn { border-color: #cdbfa6; color: var(--color-text-primary); }
+.flight-hero .hud-btn:hover,
+.flight-free .hud-btn:hover { border-color: var(--color-accent); background: rgba(226, 83, 45, 0.07); }
+.flight-hero .hud-btn--primary,
+.flight-free .hud-btn--primary { background: var(--color-accent); border-color: var(--color-accent); color: var(--color-on-accent); box-shadow: none; }
+.flight-hero .hud-btn--primary:hover,
+.flight-free .hud-btn--primary:hover { background: var(--color-accent-hover); box-shadow: 0 8px 20px -10px rgba(226, 83, 45, 0.7); }
+main[data-flight] .btn-gradient { background: var(--color-accent); color: var(--color-on-accent); box-shadow: none; }
+main[data-flight] .btn-gradient:hover { background: var(--color-accent-hover); box-shadow: 0 8px 20px -10px rgba(226, 83, 45, 0.7); }
+.flight-free .key { background: #fffdf8; border-color: #cdbfa6; color: var(--color-text-primary); }
+.flight-comms { border-color: #e0d5c1; box-shadow: 0 14px 30px -16px rgba(28, 43, 69, 0.5); }
+.flight-comms .comms-dot { background: #2e8b57; box-shadow: 0 0 6px #2e8b57; }
+/* Lock-on brackets and pulse in the biplane orange */
+main[data-flight] > section:not(.flight-hero)::before,
+main[data-flight] > section:not(.flight-hero)::after { border-color: #e2532d; }
+@keyframes lock-on {
+  0% { box-shadow: 0 18px 40px -18px rgba(28, 43, 69, 0.45); }
+  25% { box-shadow: 0 0 0 4px rgba(226, 83, 45, 0.25), 0 18px 40px -18px rgba(28, 43, 69, 0.45); }
+  100% { box-shadow: 0 18px 40px -18px rgba(28, 43, 69, 0.45); }
+}
+/* Labels floating in the sky and the rail tooltips match the paper */
+.beacon-label { background: #f6f1e6; border-color: #e0d5c1; color: #1c2b45; box-shadow: 0 6px 14px -8px rgba(28, 43, 69, 0.5); }
+.beacon-label.is-visited { border-color: #e2532d; color: #c8431f; }
+.rail-label { background: #f6f1e6; color: #1c2b45; box-shadow: 0 6px 14px -8px rgba(28, 43, 69, 0.5); }
+.rail-dot { border-color: rgba(28, 43, 69, 0.55); background: rgba(246, 241, 230, 0.85); }
+.rail-dot--icon { color: #e2532d; border-color: rgba(226, 83, 45, 0.6); }
+.rail-item.is-on .rail-dot { background: #e2532d; border-color: #e2532d; }
+.rail-item.is-on .rail-dot--icon { color: #fffaf2; }
+.rail-item[aria-current='true'] .rail-dot { box-shadow: 0 0 0 4px rgba(226, 83, 45, 0.25); }
+/* Header and footer in navy so the page frame belongs to the same palette */
+html.has-flight header { background: rgba(28, 43, 69, 0.9); --color-accent: #ff8a5c; --g1: #e2532d; --g2: #f0894a; --g3: #7cc4ff; }
+html.has-flight footer { background: #1c2b45; --color-accent: #ff8a5c; }
+
+/* ============ Case study pages: mission log over a daytime sky (CSS only) ============ */
+body:has(.case-page) .aurora,
+body:has(.case-page) .grain { display: none; }
+body:has(.case-page) header { background: rgba(28, 43, 69, 0.9); --color-accent: #ff8a5c; --g1: #e2532d; --g2: #f0894a; --g3: #7cc4ff; }
+body:has(.case-page) footer { background: #1c2b45; --color-accent: #ff8a5c; }
+
+/* Paper cards: same "Cabina vintage" tokens as the home */
+.case-page .paper-card {
+  --color-text-primary: #1c2b45;
+  --color-text-secondary: #5b6b82;
+  --color-accent: #e2532d;
+  --color-accent-hover: #c8431f;
+  --color-on-accent: #fffaf2;
+  --color-highlight: #2f7bc0;
+  --color-highlight-soft: rgba(47, 123, 192, 0.12);
+  --color-border: #e0d5c1;
+  --color-bg-primary: #f6f1e6;
+  --color-bg-secondary: #ede4d3;
+  --color-card-bg: #fffdf8;
+  --color-card-shadow: 0 6px 18px -10px rgba(28, 43, 69, 0.35);
+  --g1: #e2532d;
+  --g2: #f0894a;
+  --g3: #2f7bc0;
+  position: relative;
+  color: var(--color-text-primary);
+  background: #f6f1e6;
+  border: 1px solid #e0d5c1;
+  border-radius: 0.75rem;
+  box-shadow: 0 18px 40px -18px rgba(28, 43, 69, 0.45);
+}
+.case-page .case-hero,
+.case-page .case-section { padding: 2rem 1.25rem; }
+@media (min-width: 768px) {
+  .case-page .case-hero { padding: 2.75rem 2.5rem; }
+  .case-page .case-section { padding: 2.5rem; }
+}
+.case-page .case-section { margin-bottom: 1.5rem; }
+/* Boarding-pass stripe on the briefing and every leg */
+.case-page .case-hero,
+.case-page .case-section {
+  background-image: linear-gradient(90deg, #1c2b45 0 70%, #e2532d 70% 85%, #2f7bc0 85%);
+  background-size: 100% 5px;
+  background-repeat: no-repeat;
+}
+.case-page .case-shot { overflow: hidden; }
+.case-page .case-next { padding: 1.25rem 1.5rem; }
+.case-page .card { background-color: var(--color-card-bg); border-color: var(--color-border); box-shadow: var(--color-card-shadow); backdrop-filter: none; -webkit-backdrop-filter: none; }
+.case-page .hud-label { color: var(--color-text-secondary); }
+.case-page .btn-gradient { background: var(--color-accent); color: var(--color-on-accent); box-shadow: none; }
+.case-page .btn-gradient:hover { background: var(--color-accent-hover); box-shadow: 0 8px 20px -10px rgba(226, 83, 45, 0.7); }
+/* Dashed flight path with the little plane in the briefing's top-right corner */
+.case-route {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  width: 11rem;
+  height: auto;
+  opacity: 0.9;
+  pointer-events: none;
+}
+@media (max-width: 639px) {
+  .case-route { width: 7rem; top: 0.9rem; right: 0.9rem; opacity: 0.6; }
+}
+
+/* ============ Phones: "scenes per leg" + banner tow ============ */
+.exp-more { display: none; }
+@media (max-width: 767px) {
+  /* Cards that slide in sideways must not widen the page */
+  main[data-flight] { overflow-x: clip; }
+
+  /* Hero: sky and plane up top, the pilot card as a sheet at the bottom */
+  .flight-hero { min-height: 0; justify-content: flex-start; padding: 1.25rem 0.75rem 0; }
+  .flight-hero .hud-panel { padding: 1.1rem 1.1rem 1.25rem; }
+  .flight-hero .photo-ring img { width: 4.25rem; height: 4.25rem; border-width: 3px; }
+  .flight-hero h1 { font-size: 1.65rem; line-height: 1.1; }
+  .flight-hero .hud-panel > p.leading-relaxed { font-size: 0.9rem; margin-top: 0.6rem; }
+  .flight-hero .hud-panel > p.hud-label.mt-4,
+  .flight-cue { display: none; }
+
+  /* No side rail on phones: progress lives in the header's little plane */
+  .flight-rail { display: none; }
+
+  /* Radio: a compact toast at the bottom (the hero card sits right under the header) */
+  .flight-comms,
+  .flight-comms[data-side] { top: auto; bottom: 0.75rem; left: 0.75rem; right: 0.75rem; width: auto; padding: 0.5rem 0.75rem; }
+
+  /* Section cards: a window of sky between them, slightly tighter panels */
+  main[data-flight] > section:not(.flight-hero) { margin: 7vh 0.75rem 0; width: auto; padding: 1.75rem 1.1rem 1.5rem; }
+  main[data-flight] > #educacion { margin-top: 1rem; }
+  main[data-flight] > #contacto { margin-bottom: 10vh; }
+
+  /* Experiencia: two roles, then "Ver las N misiones" (only when JS can open the rest) */
+  html.js [data-exp-list]:not(.is-open) > li:nth-child(n + 3) { display: none; }
+  html.js .exp-more { display: inline-flex; border-color: #cdbfa6; color: var(--color-text-primary); }
+
+  /* Proyectos: a vertical list of compact cards (full-width screenshot, 3-line teaser, 3 tags) */
+  main[data-flight] #proyectos .projects-track { gap: 1rem; }
+  main[data-flight] #proyectos article .p-6 { padding: 1rem 1.1rem 1.1rem; }
+  main[data-flight] #proyectos article h3 { margin-bottom: 0.35rem; }
+  main[data-flight] #proyectos article p.text-sm {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+  }
+  main[data-flight] #proyectos article [data-stagger] { margin-bottom: 0.75rem; }
+  main[data-flight] #proyectos article [data-stagger] > :nth-child(n + 4) { display: none; }
+
+  /* Case study pages: less double padding */
+  .case-page .case-hero,
+  .case-page .case-section { padding: 1.5rem 1rem; }
+  .case-page .card.p-6 { padding: 1.1rem; }
+}
+
+/* Banner tow: the card waits off to the right, then the plane pulls it in on a rope and flies off */
+.tow-marker { height: 0; }
+.tow { display: none; }
+@media (max-width: 767px) and (prefers-reduced-motion: no-preference) {
+  /* The plane flies just above the card's top-left; the rope trails back down to the card's top edge */
+  .tow {
+    display: block;
+    position: absolute;
+    left: 8px;
+    top: -80px;
+    width: 140px;
+    height: 80px;
+    pointer-events: none;
+  }
+  .tow-plane { position: absolute; left: 0; top: 0; width: 84px; height: 42px; }
+  .tow-rope { position: absolute; left: 78px; top: 22px; width: 56px; height: 58px; }
+  main[data-flight] > section.tow-pending { translate: calc(100vw + 40px) 0; }
+  .tow-pending .tow { visibility: hidden; }
+  main[data-flight] > section.is-towing { animation: tow-card 1.3s cubic-bezier(0.4, 0.1, 0.3, 1) both; }
+  .is-towing .tow-plane { animation: tow-plane-off 1.3s ease-in both; }
+  .is-towing .tow-rope { animation: tow-rope 1.3s linear both; }
+}
+@keyframes tow-card {
+  0% { translate: calc(100vw + 40px) 0; rotate: 2deg; }
+  62% { translate: 0 0; rotate: -0.6deg; }
+  80% { translate: -5px 0; rotate: 0.3deg; }
+  100% { translate: 0 0; rotate: 0deg; }
+}
+@keyframes tow-plane-off {
+  0%, 60% { transform: none; }
+  100% { transform: translate(-75vw, -120px) rotate(-14deg); }
+}
+@keyframes tow-rope {
+  0%, 55% { opacity: 1; }
+  68%, 100% { opacity: 0; }
+}
+
+/* ============ 2D motion sky (CSS) ============ */
+/* The home's first paint on every screen: phones keep it (no WebGL there); on desktop it stands in
+   until the 3D scene is running, so reloading never flashes the old dark theme first */
+html.has-flight .m-sky { display: none; }
+@media all {
+  body:has(.flight-hero) .aurora,
+  body:has(.flight-hero) .grain { display: none; }
+  body:has(.flight-hero) header { background: rgba(28, 43, 69, 0.9); --color-accent: #ff8a5c; --g1: #e2532d; --g2: #f0894a; --g3: #7cc4ff; }
+  body:has(.flight-hero) footer { position: relative; z-index: 1; background: #1c2b45; --color-accent: #ff8a5c; } /* above the fixed sky */
+}
+
+/* ============ CSS sky (home 2D background / placeholder, case pages) ============ */
+.sky {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  height: 100lvh; /* large viewport: doesn't resize when the phone's address bar shows or hides */
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background: linear-gradient(180deg, #4f8fd0 0%, #86b8e6 42%, #c9def2 78%, #e3ecf6 100%);
+}
+.sky-cloud {
+  position: absolute;
+  left: 0;
+  top: var(--top);
+  width: var(--w);
+  aspect-ratio: 3.2 / 1;
+  opacity: var(--op);
+  background:
+    radial-gradient(ellipse 34% 48% at 32% 62%, #fff 0 45%, rgba(255, 255, 255, 0) 72%),
+    radial-gradient(ellipse 30% 56% at 55% 44%, #fff 0 45%, rgba(255, 255, 255, 0) 72%),
+    radial-gradient(ellipse 30% 42% at 75% 64%, #fff 0 45%, rgba(255, 255, 255, 0) 72%),
+    radial-gradient(ellipse 48% 30% at 52% 74%, rgba(255, 255, 255, 0.95) 0 50%, rgba(255, 255, 255, 0) 75%);
+  transform: translate3d(-110%, 0, 0);
+  animation: cloud-cross var(--dur) linear var(--delay) infinite;
+}
+/* Kept moving with reduced motion too (the owner's choice), just three times slower */
+@media (prefers-reduced-motion: reduce) {
+  .sky-cloud { animation-duration: calc(var(--dur) * 3); }
+}
+@keyframes cloud-cross {
+  from { transform: translate3d(-110%, 0, 0); }
+  to { transform: translate3d(110vw, 0, 0); }
+}
+
+/* ============ Performance ============ */
+/* No backdrop blur on the header over the moving sky / 3D (it would be recomputed every frame) */
+body:has(.flight-hero) header,
+body:has(.case-page) header { backdrop-filter: none; -webkit-backdrop-filter: none; }
+/* Phones: the photo ring stays still (a spinning, blurred conic gradient repaints every frame) */
+@media (max-width: 767px) {
+  .photo-ring::before,
+  .photo-ring::after { animation: none !important; }
+  .photo-ring::after { filter: none; inset: -3px; opacity: 0.35; }
+}
+
+/* Experiencia timeline on the paper cards: all orange, from a bright glow to a deep tone (no blue) */
+main[data-flight] .timeline::before { background: #ead9c4; }
+main[data-flight] .timeline::after {
+  width: 3px;
+  background: linear-gradient(180deg, #ffc48a 0%, #ff9a52 30%, #f0702f 62%, #e2532d 82%, #c8431f 100%);
+  box-shadow: 0 0 10px rgba(255, 138, 76, 0.75), 0 0 2px rgba(255, 196, 138, 0.9);
+}
+main[data-flight] .timeline-dot.is-active {
+  background: radial-gradient(circle at 35% 35%, #ffd2a6 0%, #ff9a52 45%, #e2532d 100%);
+  box-shadow: 0 0 0 4px rgba(226, 83, 45, 0.18), 0 0 14px rgba(255, 138, 76, 0.8);
+}
+
+/* Sound hint: a paper bubble pointing at the ♪ button on the rail (desktop only, a few seconds) */
+.sound-hint {
+  position: absolute;
+  right: calc(100% + 0.75rem);
+  top: 50%;
+  width: 15rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.5rem;
+  background: #f6f1e6;
+  border: 1px solid #e0d5c1;
+  color: #1c2b45;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  box-shadow: 0 12px 26px -14px rgba(28, 43, 69, 0.55);
+  opacity: 0;
+  transform: translate(6px, -50%);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  pointer-events: none;
+}
+.sound-hint::after {
+  content: '';
+  position: absolute;
+  right: -6px;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  background: #f6f1e6;
+  border-right: 1px solid #e0d5c1;
+  border-top: 1px solid #e0d5c1;
+  transform: translateY(-50%) rotate(45deg);
+}
+.sound-hint.is-shown { opacity: 1; transform: translate(0, -50%); }
+.sound-hint[hidden] { display: none; }
+@media (max-width: 767px) { .sound-hint { display: none; } }

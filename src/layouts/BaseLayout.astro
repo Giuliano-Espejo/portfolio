@@ -1,5 +1,5 @@
 ---
-import "@fontsource-variable/inter";
+import "@fontsource-variable/hanken-grotesk";
 import "@fontsource-variable/space-grotesk";
 import "@fontsource/jetbrains-mono";
 import "../styles/global.css";
@@ -61,7 +61,7 @@ const structuredData = {
 ---
 
 <!doctype html>
-<html lang="es" class="">
+<html lang="es" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -95,21 +95,10 @@ const structuredData = {
     <!-- JSON-LD structured data: Person + WebSite on every page, plus page-specific nodes -->
     <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
 
-    <meta name="theme-color" content="#f4f4f5" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#0a0b10" />
 
-    <!-- Theme flash prevention — runs before first paint.
-         The `js` class gates the scroll animations so content stays visible without JS. -->
-    <script is:inline>
-      (function() {
-        const root = document.documentElement;
-        root.classList.add('js');
-        let theme = null;
-        try { theme = localStorage.getItem('theme'); } catch (e) {}
-        theme = theme ?? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-        root.classList.toggle('dark', theme === 'dark');
-      })();
-    </script>
+    <!-- The `js` class gates the scroll animations so content stays visible without JS -->
+    <script is:inline>document.documentElement.classList.add('js');</script>
   </head>
   <body class="min-h-screen antialiased">
     <!-- Decorative background: drifting blue glows + film grain -->
@@ -168,18 +157,30 @@ const structuredData = {
   // header progress bar, background parallax and the experience timeline fill
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const progressBar = document.querySelector<HTMLElement>('[data-scroll-progress]');
-  const parallaxLayers = [...document.querySelectorAll<HTMLElement>('[data-parallax]')];
+  // Skip parallax layers that are hidden (the aurora is display:none on the sky pages)
+  const parallaxLayers = [...document.querySelectorAll<HTMLElement>('[data-parallax]')].filter(
+    (el) => getComputedStyle(el.closest('.aurora') ?? el).display !== 'none',
+  );
+  // Dot offsets are measured once (and when the list changes size), not on every scroll frame
   const timelines = [...document.querySelectorAll<HTMLElement>('[data-timeline]')].map((el) => ({
     el,
     dots: [...el.querySelectorAll<HTMLElement>('.timeline-dot')],
+    offsets: [] as number[],
   }));
+  const measureTimelines = () => {
+    timelines.forEach((t) => {
+      const top = t.el.getBoundingClientRect().top;
+      t.offsets = t.dots.map((dot) => dot.getBoundingClientRect().top - top);
+    });
+  };
 
   const clamp = (n: number) => Math.min(Math.max(n, 0), 1);
 
   function update() {
     const y = window.scrollY;
     const max = document.documentElement.scrollHeight - window.innerHeight;
-    progressBar?.style.setProperty('--progress', max > 0 ? (y / max).toFixed(4) : '0');
+    // Set on the header so the bar and the little plane riding it share the value
+    (progressBar?.parentElement ?? progressBar)?.style.setProperty('--progress', max > 0 ? (y / max).toFixed(4) : '0');
 
     if (reduceMotion) return;
 
@@ -188,14 +189,14 @@ const structuredData = {
       layer.style.transform = `translate3d(0, ${(y * speed * -1).toFixed(1)}px, 0)`;
     });
 
-    timelines.forEach(({ el, dots }) => {
-      const rect = el.getBoundingClientRect();
+    timelines.forEach(({ el, dots, offsets }) => {
+      const rect = el.getBoundingClientRect(); // one layout read per timeline
       // The line fills as the timeline passes the middle of the viewport
       const progress = clamp((window.innerHeight * 0.55 - rect.top) / rect.height);
       el.style.setProperty('--progress', progress.toFixed(4));
-      const filled = rect.top + progress * rect.height;
-      dots.forEach((dot) => {
-        dot.classList.toggle('is-active', dot.getBoundingClientRect().top <= filled);
+      const filled = progress * rect.height;
+      dots.forEach((dot, i) => {
+        dot.classList.toggle('is-active', (offsets[i] ?? 0) <= filled);
       });
     });
   }
@@ -212,6 +213,11 @@ const structuredData = {
 
   if (reduceMotion) {
     timelines.forEach(({ dots }) => dots.forEach((dot) => dot.classList.add('is-active')));
+  } else {
+    measureTimelines();
+    // Re-measure when a timeline changes size (fonts loading, "Ver las N misiones")
+    const ro = new ResizeObserver(() => { measureTimelines(); onScroll(); });
+    timelines.forEach(({ el }) => ro.observe(el));
   }
   update();
   window.addEventListener('scroll', onScroll, { passive: true });
