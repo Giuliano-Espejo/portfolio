@@ -25,6 +25,7 @@ export interface CaseStudy {
   stats?: { value: string; label: string }[];
 }
 
+
 export interface NextMission { slug: string; title: string }
 
 /** Order of the missions (same as the home's Proyectos section) — drives "Próxima misión / Next mission" */
